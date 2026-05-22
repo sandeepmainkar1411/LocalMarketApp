@@ -1,5 +1,5 @@
-import RoleSelectionScreen from '../screens/RoleSelectionScreen';
+import AppNavigator from '../navigation/AppNavigator';
 
-export default function HomeScreen() {
-  return <RoleSelectionScreen />;
+export default function Index() {
+  return <AppNavigator />;
 }

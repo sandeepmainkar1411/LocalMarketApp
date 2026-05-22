@@ -1,16 +1,29 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function RoleSelectionScreen() {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Local Market App</Text>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Continue as Customer</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('CustomerLogin')}
+      >
+        <Text style={styles.buttonText}>
+          Continue as Customer
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Continue as Vendor</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('VendorLogin')}
+      >
+        <Text style={styles.buttonText}>
+          Continue as Vendor
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -20,27 +33,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
     padding: 20,
+    backgroundColor: '#ffffff',
   },
   title: {
-    fontSize: 30,
+    fontSize: 34,
     fontWeight: 'bold',
-    marginBottom: 40,
+    textAlign: 'center',
+    marginBottom: 60,
   },
   button: {
-    backgroundColor: '#2E7D32',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
+    backgroundColor: '#2e7d32',
+    padding: 18,
+    borderRadius: 12,
     marginBottom: 20,
-    width: '80%',
-    alignItems: 'center',
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
