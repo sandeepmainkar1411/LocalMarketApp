@@ -1,8 +1,8 @@
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
 
-export default function CustomerLoginScreen({ navigation }: any) {
-  const [phone, setPhone] = useState("");
+export default function OtpVerificationScreen({ navigation }: any) {
+  const [otp, setOtp] = useState("");
 
   return (
     <View
@@ -20,14 +20,14 @@ export default function CustomerLoginScreen({ navigation }: any) {
           marginBottom: 40,
         }}
       >
-        Customer Login
+        Verify OTP
       </Text>
 
       <TextInput
-        placeholder="Enter Mobile Number"
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
+        placeholder="Enter OTP"
+        value={otp}
+        onChangeText={setOtp}
+        keyboardType="number-pad"
         style={{
           borderWidth: 1,
           borderColor: "#ccc",
@@ -38,7 +38,7 @@ export default function CustomerLoginScreen({ navigation }: any) {
       />
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("OtpVerification")}
+        onPress={() => navigation.navigate("CustomerDashboard")}
         style={{
           backgroundColor: "green",
           padding: 15,
@@ -52,7 +52,7 @@ export default function CustomerLoginScreen({ navigation }: any) {
             fontWeight: "bold",
           }}
         >
-          Send OTP
+          Verify OTP
         </Text>
       </TouchableOpacity>
 

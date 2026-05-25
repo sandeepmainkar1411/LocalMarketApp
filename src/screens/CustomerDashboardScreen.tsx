@@ -1,15 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 
-export default function CustomerLoginScreen({ navigation }: any) {
-  const [phone, setPhone] = useState("");
-
+export default function CustomerDashboardScreen() {
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
         padding: 20,
+        justifyContent: "center",
       }}
     >
       <Text
@@ -20,27 +17,31 @@ export default function CustomerLoginScreen({ navigation }: any) {
           marginBottom: 40,
         }}
       >
-        Customer Login
+        Customer Dashboard
       </Text>
 
-      <TextInput
-        placeholder="Enter Mobile Number"
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 10,
-          padding: 15,
-          marginBottom: 20,
-        }}
-      />
-
       <TouchableOpacity
-        onPress={() => navigation.navigate("OtpVerification")}
         style={{
           backgroundColor: "green",
+          padding: 15,
+          borderRadius: 10,
+          marginBottom: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+        >
+          Browse Local Vendors
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{
+          backgroundColor: "orange",
           padding: 15,
           borderRadius: 10,
         }}
@@ -52,23 +53,7 @@ export default function CustomerLoginScreen({ navigation }: any) {
             fontWeight: "bold",
           }}
         >
-          Send OTP
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            textAlign: "center",
-            color: "blue",
-          }}
-        >
-          Back
+          View Nearby Deals
         </Text>
       </TouchableOpacity>
     </View>
