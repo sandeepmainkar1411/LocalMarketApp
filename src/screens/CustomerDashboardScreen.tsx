@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 
-export default function CustomerDashboardScreen() {
+export default function CustomerDashboardScreen({ navigation }: any) {
   return (
     <View
       style={{
@@ -21,6 +21,7 @@ export default function CustomerDashboardScreen() {
       </Text>
 
       <TouchableOpacity
+        onPress={() => navigation.navigate("VendorList")}
         style={{
           backgroundColor: "green",
           padding: 15,

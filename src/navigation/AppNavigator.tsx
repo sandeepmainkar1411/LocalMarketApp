@@ -5,6 +5,8 @@ import CustomerLoginScreen from '../screens/CustomerLoginScreen';
 import VendorLoginScreen from '../screens/VendorLoginScreen';
 import OtpVerificationScreen from "../screens/OtpVerificationScreen";
 import CustomerDashboardScreen from "../screens/CustomerDashboardScreen";
+import VendorListScreen from "../screens/VendorListScreen";
+import VendorDetailsScreen from "../screens/VendorDetailsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +40,16 @@ export default function AppNavigator() {
       <Stack.Screen
         name="CustomerDashboard"
         component={CustomerDashboardScreen}
+      />
+
+      <Stack.Screen
+       name="VendorList"
+       component={VendorListScreen}
+      />
+
+      <Stack.Screen
+        name="VendorDetails"
+        component={VendorDetailsScreen}
       />
     </Stack.Navigator>
    
