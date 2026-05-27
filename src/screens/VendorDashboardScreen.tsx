@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-export default function VendorLoginScreen({
+export default function VendorDashboardScreen({
   navigation,
 }: any) {
   return (
@@ -21,59 +21,56 @@ export default function VendorLoginScreen({
           fontSize: 32,
           fontWeight: "bold",
           textAlign: "center",
-          marginBottom: 20,
-        }}
-      >
-        Vendor Login 🛒
-      </Text>
-
-      <Text
-        style={{
-          textAlign: "center",
-          color: "gray",
           marginBottom: 40,
-          fontSize: 16,
-          lineHeight: 24,
         }}
       >
-        Manage your vegetables, prices,
-        {"\n"}
-        and customer orders easily 🚀
+        Vendor Dashboard 🛒
       </Text>
 
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("VendorDashboard")
+          navigation.navigate("VendorAddProduct")
         }
         style={{
           backgroundColor: "green",
           padding: 18,
           borderRadius: 12,
           marginBottom: 20,
-          elevation: 3,
         }}
       >
         <Text
           style={{
             color: "white",
             textAlign: "center",
-            fontWeight: "bold",
             fontSize: 18,
+            fontWeight: "bold",
           }}
         >
-          Continue as Vendor
+          Manage Products
         </Text>
       </TouchableOpacity>
 
-      <Text
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("VendorOrders")
+        }
         style={{
-          textAlign: "center",
-          color: "gray",
-          fontSize: 14,
+          backgroundColor: "orange",
+          padding: 18,
+          borderRadius: 12,
         }}
       >
-        Store Timing: 8 AM – 8 PM
-      </Text>
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontSize: 18,
+            fontWeight: "bold",
+          }}
+        >
+          View Orders
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

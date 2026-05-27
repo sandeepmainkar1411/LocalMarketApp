@@ -9,26 +9,39 @@ const vegetables = [
   {
     id: "1",
     name: "Tomato",
-    price: "₹40 / kg",
+    marathi: "टोमॅटो",
+    price: 40,
+    unit: "KG",
   },
+
   {
     id: "2",
     name: "Potato",
-    price: "₹30 / kg",
+    marathi: "बटाटा",
+    price: 30,
+    unit: "KG",
   },
+
   {
     id: "3",
     name: "Onion",
-    price: "₹35 / kg",
+    marathi: "कांदा",
+    price: 35,
+    unit: "KG",
   },
+
   {
     id: "4",
     name: "Carrot",
-    price: "₹60 / kg",
+    marathi: "गाजर",
+    price: 60,
+    unit: "KG",
   },
 ];
 
-export default function VendorDetailsScreen() {
+export default function VendorDetailsScreen({
+  navigation,
+}: any) {
   return (
     <View
       style={{
@@ -39,10 +52,10 @@ export default function VendorDetailsScreen() {
     >
       <Text
         style={{
-          fontSize: 28,
+          fontSize: 32,
           fontWeight: "bold",
           textAlign: "center",
-          marginBottom: 20,
+          marginBottom: 30,
         }}
       >
         Fresh Vegetable Market 🥬
@@ -56,74 +69,66 @@ export default function VendorDetailsScreen() {
             style={{
               backgroundColor: "#ffffff",
               padding: 20,
-              borderRadius: 15,
-              marginBottom: 15,
+              borderRadius: 12,
+              marginBottom: 20,
               borderWidth: 1,
-              borderColor: "#e5e5e5",
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
+              borderColor: "#ddd",
             }}
           >
             <Text
               style={{
-                fontSize: 20,
+                fontSize: 26,
                 fontWeight: "bold",
+                marginBottom: 10,
               }}
             >
-              {item.name}
+              {item.marathi}
             </Text>
 
             <Text
               style={{
-                marginTop: 5,
+                fontSize: 22,
                 color: "green",
                 fontWeight: "bold",
+                marginBottom: 10,
+              }}
+            >
+              ₹{item.price} / {item.unit}
+            </Text>
+
+            <Text
+              style={{
+                color: "gray",
+                marginBottom: 20,
                 fontSize: 16,
               }}
             >
-              {item.price}
+              Fresh & Organic
             </Text>
 
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Cart")
+              }
               style={{
-                marginTop: 15,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
+                backgroundColor: "green",
+                paddingVertical: 14,
+                borderRadius: 10,
+                width: 120,
+                alignSelf: "flex-end",
               }}
             >
               <Text
                 style={{
-                  color: "gray",
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: 18,
                 }}
               >
-                Fresh & Organic
+                Add
               </Text>
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "green",
-                  paddingVertical: 8,
-                  paddingHorizontal: 15,
-                  borderRadius: 8,
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Add
-                </Text>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
         )}
       />

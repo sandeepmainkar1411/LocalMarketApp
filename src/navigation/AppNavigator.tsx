@@ -7,6 +7,11 @@ import OtpVerificationScreen from "../screens/OtpVerificationScreen";
 import CustomerDashboardScreen from "../screens/CustomerDashboardScreen";
 import VendorListScreen from "../screens/VendorListScreen";
 import VendorDetailsScreen from "../screens/VendorDetailsScreen";
+import VendorDashboardScreen from "../screens/VendorDashboardScreen";
+import VendorAddProductScreen from "../screens/VendorAddProductScreen";
+import VendorOrdersScreen from "../screens/VendorOrdersScreen";
+import CartScreen from "../screens/CartScreen";
+import OrderSuccessScreen from "../screens/OrderSuccessScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +56,27 @@ export default function AppNavigator() {
         name="VendorDetails"
         component={VendorDetailsScreen}
       />
+      <Stack.Screen
+        name="VendorAddProduct"
+        component={VendorAddProductScreen}
+      />
+      <Stack.Screen
+        name="VendorDashboard"
+        component={VendorDashboardScreen}
+      />
+      <Stack.Screen
+        name="VendorOrders"
+        component={VendorOrdersScreen}
+      />
+      <Stack.Screen
+        name="Cart"
+        component={CartScreen}
+      />
+      <Stack.Screen
+        name="OrderSuccess"
+        component={OrderSuccessScreen}
+      />
+      
     </Stack.Navigator>
    
   );
