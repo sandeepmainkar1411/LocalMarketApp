@@ -9,6 +9,7 @@ import {
 
 import { db } from "../firebase/firebaseConfig";
 
+/* CREATE ORDER */
 export const createOrder = async (
   orderData: any
 ) => {
@@ -32,6 +33,7 @@ export const createOrder = async (
   }
 };
 
+/* FETCH ORDERS */
 export const fetchOrders = async () => {
   try {
     const querySnapshot = await getDocs(
@@ -58,17 +60,31 @@ export const fetchOrders = async () => {
   }
 };
 
+/* UPDATE ORDER */
 export const updateOrder = async (
   orderId: string,
   orderData: any
 ) => {
   try {
-    const orderRef = doc(db, "orders", orderId);
-    await updateDoc(orderRef, orderData);
+    const orderRef = doc(
+      db,
+      "orders",
+      orderId
+    );
+
+    await updateDoc(
+      orderRef,
+      orderData
+    );
   } catch (error) {
-    console.log("Update Error:", error);
+    console.log(
+      "Update Error:",
+      error
+    );
   }
 };
+
+/* REALTIME ORDER SYNC */
 export const subscribeToOrders = (
   callback: any
 ) => {
