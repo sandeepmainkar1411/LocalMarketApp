@@ -1,29 +1,42 @@
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 
 const vendors = [
   {
     id: "1",
-    name: "Green Fresh Vegetables",
+    name: "Fresh Vegetable Market",
     category: "Fresh Vegetables",
+    locality: "JB Nagar",
   },
+
   {
     id: "2",
     name: "Organic Veggie Store",
     category: "Organic Vegetables",
+    locality: "Andheri",
   },
+
   {
     id: "3",
     name: "Farm Direct Market",
     category: "Farm Fresh Produce",
+    locality: "Powai",
   },
 ];
 
-export default function VendorListScreen({ navigation }: any) {
+export default function VendorListScreen({
+  navigation,
+}: any) {
   return (
     <View
       style={{
         flex: 1,
         padding: 20,
+        backgroundColor: "#f5f5f5",
       }}
     >
       <Text
@@ -42,7 +55,14 @@ export default function VendorListScreen({ navigation }: any) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate("VendorDetails")}
+            onPress={() =>
+              navigation.navigate(
+                "VendorDetails",
+                {
+                  vendor: item,
+                }
+              )
+            }
             style={{
               backgroundColor: "#fff",
               padding: 20,
@@ -50,7 +70,6 @@ export default function VendorListScreen({ navigation }: any) {
               marginBottom: 15,
               borderWidth: 1,
               borderColor: "#ddd",
-              
             }}
           >
             <Text

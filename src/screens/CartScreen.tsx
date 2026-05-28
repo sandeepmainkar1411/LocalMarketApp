@@ -1,3 +1,5 @@
+import { createOrder } from "../services/orderService";
+
 import {
   View,
   Text,
@@ -8,33 +10,20 @@ import {
 
 import { useState } from "react";
 
-import { orders } from "../data/orders";
-
 export default function CartScreen({
   navigation,
+  route,
 }: any) {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      name: "टोमॅटो",
-      price: 40,
-      quantity: 2,
-      unit: "KG",
-    },
-
-    {
-      id: "2",
-      name: "कांदा",
-      price: 35,
-      quantity: 1,
-      unit: "KG",
-    },
-  ]);
+  const [cartItems, setCartItems] =
+    useState(
+      route?.params?.cartItems || []
+    );
 
   const [building, setBuilding] =
     useState("");
 
-  const [flat, setFlat] = useState("");
+  const [flat, setFlat] =
+    useState("");
 
   const [landmark, setLandmark] =
     useState("");
@@ -42,62 +31,74 @@ export default function CartScreen({
   const [mobile, setMobile] =
     useState("");
 
-  const increaseQuantity = (id: string) => {
-    const updatedItems = cartItems.map(
-      (item) => {
+  const increaseQuantity = (
+    id: string
+  ) => {
+    const updatedItems =
+      cartItems.map((item: any) => {
         if (item.id === id) {
           return {
             ...item,
-            quantity: item.quantity + 1,
+            quantity:
+              item.quantity + 1,
           };
         }
 
         return item;
-      }
-    );
+      });
 
     setCartItems(updatedItems);
   };
 
-  const decreaseQuantity = (id: string) => {
-    const selectedItem = cartItems.find(
-      (item) => item.id === id
-    );
+  const decreaseQuantity = (
+    id: string
+  ) => {
+    const selectedItem =
+      cartItems.find(
+        (item: any) =>
+          item.id === id
+      );
 
     if (
       selectedItem &&
       selectedItem.quantity === 1
     ) {
-      const updatedItems = cartItems.filter(
-        (item) => item.id !== id
-      );
+      const updatedItems =
+        cartItems.filter(
+          (item: any) =>
+            item.id !== id
+        );
 
       setCartItems(updatedItems);
 
       return;
     }
 
-    const updatedItems = cartItems.map(
-      (item) => {
+    const updatedItems =
+      cartItems.map((item: any) => {
         if (item.id === id) {
           return {
             ...item,
-            quantity: item.quantity - 1,
+            quantity:
+              item.quantity - 1,
           };
         }
 
         return item;
-      }
-    );
+      });
 
     setCartItems(updatedItems);
   };
 
-  const totalAmount = cartItems.reduce(
-    (total, item) =>
-      total + item.price * item.quantity,
-    0
-  );
+  const totalAmount =
+    cartItems.reduce(
+      (
+        total: number,
+        item: any
+      ) =>
+        total + item.price,
+      0
+    );
 
   return (
     <ScrollView
@@ -135,122 +136,199 @@ export default function CartScreen({
           </Text>
         )}
 
-        {cartItems.map((item) => (
-          <View
-            key={item.id}
-            style={{
-              backgroundColor: "#ffffff",
-              padding: 20,
-              borderRadius: 12,
-              marginBottom: 20,
-              borderWidth: 1,
-              borderColor: "#ddd",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 24,
-                fontWeight: "bold",
-                marginBottom: 10,
-              }}
-            >
-              {item.name}
-            </Text>
-
-            <Text
-              style={{
-                fontSize: 18,
-                color: "green",
-                fontWeight: "bold",
-                marginBottom: 15,
-              }}
-            >
-              ₹{item.price} / {item.unit}
-            </Text>
-
+        {cartItems.map(
+          (item: any) => (
             <View
+              key={
+                item.id +
+                item.displayQuantity
+              }
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() =>
-                  decreaseQuantity(item.id)
-                }
-                style={{
-                  backgroundColor: "red",
-                  width: 45,
-                  height: 45,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white",
-                    fontSize: 24,
-                    fontWeight: "bold",
-                  }}
-                >
-                  -
-                </Text>
-              </TouchableOpacity>
+                backgroundColor:
+                  "#ffffff",
 
-              <Text
-                style={{
-                  fontSize: 22,
-                  fontWeight: "bold",
-                }}
-              >
-                {item.quantity}
-              </Text>
-
-              <TouchableOpacity
-                onPress={() =>
-                  increaseQuantity(item.id)
-                }
-                style={{
-                  backgroundColor: "green",
-                  width: 45,
-                  height: 45,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white",
-                    fontSize: 24,
-                    fontWeight: "bold",
-                  }}
-                >
-                  +
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-
-        {cartItems.length > 0 && (
-          <>
-            <View
-              style={{
-                backgroundColor: "#ffffff",
                 padding: 20,
+
                 borderRadius: 12,
-                marginBottom: 30,
+
+                marginBottom: 20,
+
                 borderWidth: 1,
+
                 borderColor: "#ddd",
               }}
             >
               <Text
                 style={{
                   fontSize: 24,
-                  fontWeight: "bold",
+
+                  fontWeight:
+                    "bold",
+
+                  marginBottom: 10,
+                }}
+              >
+                {item.name}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 20,
+
+                  color: "orange",
+
+                  fontWeight:
+                    "bold",
+
+                  marginBottom: 10,
+                }}
+              >
+                {item.displayQuantity}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 18,
+
+                  color: "green",
+
+                  fontWeight:
+                    "bold",
+
+                  marginBottom: 15,
+                }}
+              >
+                ₹{item.price}
+              </Text>
+
+              <View
+                style={{
+                  flexDirection:
+                    "row",
+
+                  alignItems:
+                    "center",
+
+                  justifyContent:
+                    "space-between",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() =>
+                    decreaseQuantity(
+                      item.id
+                    )
+                  }
+                  style={{
+                    backgroundColor:
+                      "red",
+
+                    width: 45,
+
+                    height: 45,
+
+                    borderRadius: 10,
+
+                    justifyContent:
+                      "center",
+
+                    alignItems:
+                      "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color:
+                        "white",
+
+                      fontSize: 24,
+
+                      fontWeight:
+                        "bold",
+                    }}
+                  >
+                    -
+                  </Text>
+                </TouchableOpacity>
+
+                <Text
+                  style={{
+                    fontSize: 22,
+
+                    fontWeight:
+                      "bold",
+                  }}
+                >
+                  {item.quantity}
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    increaseQuantity(
+                      item.id
+                    )
+                  }
+                  style={{
+                    backgroundColor:
+                      "green",
+
+                    width: 45,
+
+                    height: 45,
+
+                    borderRadius: 10,
+
+                    justifyContent:
+                      "center",
+
+                    alignItems:
+                      "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color:
+                        "white",
+
+                      fontSize: 24,
+
+                      fontWeight:
+                        "bold",
+                    }}
+                  >
+                    +
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )
+        )}
+
+        {cartItems.length > 0 && (
+          <>
+            <View
+              style={{
+                backgroundColor:
+                  "#ffffff",
+
+                padding: 20,
+
+                borderRadius: 12,
+
+                marginBottom: 30,
+
+                borderWidth: 1,
+
+                borderColor: "#ddd",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 24,
+
+                  fontWeight:
+                    "bold",
+
                   marginBottom: 20,
                 }}
               >
@@ -260,12 +338,19 @@ export default function CartScreen({
               <TextInput
                 placeholder="Building Name"
                 value={building}
-                onChangeText={setBuilding}
+                onChangeText={
+                  setBuilding
+                }
                 style={{
-                  backgroundColor: "#f5f5f5",
+                  backgroundColor:
+                    "#f5f5f5",
+
                   padding: 15,
+
                   borderRadius: 10,
+
                   marginBottom: 15,
+
                   fontSize: 16,
                 }}
               />
@@ -275,10 +360,15 @@ export default function CartScreen({
                 value={flat}
                 onChangeText={setFlat}
                 style={{
-                  backgroundColor: "#f5f5f5",
+                  backgroundColor:
+                    "#f5f5f5",
+
                   padding: 15,
+
                   borderRadius: 10,
+
                   marginBottom: 15,
+
                   fontSize: 16,
                 }}
               />
@@ -286,12 +376,19 @@ export default function CartScreen({
               <TextInput
                 placeholder="Landmark"
                 value={landmark}
-                onChangeText={setLandmark}
+                onChangeText={
+                  setLandmark
+                }
                 style={{
-                  backgroundColor: "#f5f5f5",
+                  backgroundColor:
+                    "#f5f5f5",
+
                   padding: 15,
+
                   borderRadius: 10,
+
                   marginBottom: 15,
+
                   fontSize: 16,
                 }}
               />
@@ -302,10 +399,15 @@ export default function CartScreen({
                 value={mobile}
                 onChangeText={setMobile}
                 style={{
-                  backgroundColor: "#f5f5f5",
+                  backgroundColor:
+                    "#f5f5f5",
+
                   padding: 15,
+
                   borderRadius: 10,
+
                   marginBottom: 15,
+
                   fontSize: 16,
                 }}
               />
@@ -313,18 +415,27 @@ export default function CartScreen({
 
             <View
               style={{
-                backgroundColor: "#ffffff",
+                backgroundColor:
+                  "#ffffff",
+
                 padding: 20,
+
                 borderRadius: 12,
+
                 marginBottom: 30,
+
                 borderWidth: 1,
+
                 borderColor: "#ddd",
               }}
             >
               <Text
                 style={{
                   fontSize: 24,
-                  fontWeight: "bold",
+
+                  fontWeight:
+                    "bold",
+
                   marginBottom: 10,
                 }}
               >
@@ -334,8 +445,11 @@ export default function CartScreen({
               <Text
                 style={{
                   fontSize: 32,
+
                   color: "green",
-                  fontWeight: "bold",
+
+                  fontWeight:
+                    "bold",
                 }}
               >
                 ₹{totalAmount}
@@ -345,21 +459,29 @@ export default function CartScreen({
                 <Text
                   style={{
                     color: "red",
+
                     marginTop: 10,
-                    fontWeight: "bold",
+
+                    fontWeight:
+                      "bold",
                   }}
                 >
-                  Minimum order should be ₹200
+                  Minimum order should
+                  be ₹200
                 </Text>
               )}
             </View>
 
             <TouchableOpacity
-              disabled={totalAmount < 200}
-              onPress={() => {
+              disabled={
+                totalAmount < 200
+              }
+              onPress={async () => {
                 if (
-                  building.trim() === "" ||
-                  flat.trim() === "" ||
+                  building.trim() ===
+                    "" ||
+                  flat.trim() ===
+                    "" ||
                   mobile.trim() === ""
                 ) {
                   alert(
@@ -370,22 +492,30 @@ export default function CartScreen({
                 }
 
                 const newOrder = {
-                  id: Date.now().toString(),
+                  customer:
+                    "Rahul Sharma",
 
-                  customer: "Rahul Sharma",
+                  items: cartItems,
 
-                  items: cartItems
-                    .map((item) => item.name)
-                    .join(", "),
+                  total:
+                    totalAmount,
 
-                  total: totalAmount,
-
-                  address: `${flat}, ${building}`,
+                  address: {
+                    building,
+                    flat,
+                    landmark,
+                    mobile,
+                  },
 
                   status: "Placed",
+
+                  createdAt:
+                    new Date(),
                 };
 
-                orders.push(newOrder);
+                await createOrder(
+                  newOrder
+                );
 
                 navigation.navigate(
                   "OrderSuccess"
@@ -398,16 +528,23 @@ export default function CartScreen({
                     : "gray",
 
                 padding: 20,
+
                 borderRadius: 12,
+
                 marginBottom: 40,
               }}
             >
               <Text
                 style={{
                   color: "white",
-                  textAlign: "center",
+
+                  textAlign:
+                    "center",
+
                   fontSize: 20,
-                  fontWeight: "bold",
+
+                  fontWeight:
+                    "bold",
                 }}
               >
                 Place Order

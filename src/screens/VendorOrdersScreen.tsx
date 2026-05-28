@@ -5,26 +5,53 @@ import {
   ScrollView,
 } from "react-native";
 
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-import { orders } from "../data/orders";
+import {
+  subscribeToOrders,
+  updateOrder,
+} from "../services/orderService";
 
 export default function VendorOrdersScreen() {
-  const [, forceUpdate] = useState(0);
+  const [vendorOrders, setVendorOrders] =
+    useState<any[]>([]);
 
-  const updateOrderStatus = (
-    id: string,
-    status: string
+  useEffect(() => {
+    const unsubscribe =
+      subscribeToOrders(
+        (ordersData: any[]) => {
+          setVendorOrders(ordersData);
+        }
+      );
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleAccept = async (
+    orderId: string
   ) => {
-    const orderIndex = orders.findIndex(
-      (order) => order.id === id
-    );
+    await updateOrder(orderId, {
+      status: "Accepted",
+    });
+  };
 
-    if (orderIndex !== -1) {
-      orders[orderIndex].status = status;
+  const handleReject = async (
+    orderId: string
+  ) => {
+    await updateOrder(orderId, {
+      status: "Rejected",
+    });
+  };
 
-      forceUpdate((prev) => prev + 1);
-    }
+  const handleDelivered = async (
+    orderId: string
+  ) => {
+    await updateOrder(orderId, {
+      status: "Delivered",
+    });
   };
 
   return (
@@ -41,7 +68,7 @@ export default function VendorOrdersScreen() {
       >
         <Text
           style={{
-            fontSize: 32,
+            fontSize: 34,
             fontWeight: "bold",
             textAlign: "center",
             marginBottom: 30,
@@ -50,12 +77,12 @@ export default function VendorOrdersScreen() {
           Vendor Orders 📦
         </Text>
 
-        {orders.length === 0 && (
+        {vendorOrders.length === 0 && (
           <Text
             style={{
               textAlign: "center",
+              fontSize: 22,
               color: "gray",
-              fontSize: 18,
               marginTop: 50,
             }}
           >
@@ -63,101 +90,179 @@ export default function VendorOrdersScreen() {
           </Text>
         )}
 
-        {orders.map((order) => (
+        {vendorOrders.map((order) => (
           <View
             key={order.id}
             style={{
               backgroundColor: "#ffffff",
               padding: 20,
-              borderRadius: 12,
+              borderRadius: 15,
               marginBottom: 20,
               borderWidth: 1,
               borderColor: "#ddd",
             }}
           >
+            {/* Customer Name */}
             <Text
               style={{
-                fontSize: 24,
+                fontSize: 28,
                 fontWeight: "bold",
-                marginBottom: 10,
+                marginBottom: 15,
               }}
             >
               👤 {order.customer}
             </Text>
 
-            <Text
+            {/* Products */}
+            <View
               style={{
-                fontSize: 18,
-                marginBottom: 10,
+                marginBottom: 15,
               }}
             >
-              🥬 {order.items}
-            </Text>
+              {order.items?.map(
+                (
+                  item: any,
+                  index: number
+                ) => (
+                  <Text
+                    key={index}
+                    style={{
+                      fontSize: 18,
+                      marginBottom: 6,
+                    }}
+                  >
+                    🥬 {item.name} -{" "}
+                    {item.quantity}{" "}
+                    {item.unit}
+                  </Text>
+                )
+              )}
+            </View>
 
-            <Text
+            {/* Address */}
+            <View
               style={{
-                fontSize: 18,
-                marginBottom: 10,
+                marginBottom: 15,
               }}
             >
-              📍 {order.address}
-            </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  marginBottom: 5,
+                }}
+              >
+                📍{" "}
+                {
+                  order.address?.flat
+                }
+                ,{" "}
+                {
+                  order.address
+                    ?.building
+                }
+              </Text>
 
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "gray",
+                  marginBottom: 5,
+                }}
+              >
+                Landmark:{" "}
+                {
+                  order.address
+                    ?.landmark
+                }
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "gray",
+                  fontWeight: "bold",
+                }}
+              >
+                📞{" "}
+                {
+                  order.address
+                    ?.mobile
+                }
+              </Text>
+            </View>
+
+            {/* Total */}
             <Text
               style={{
-                fontSize: 22,
+                fontSize: 32,
                 color: "green",
                 fontWeight: "bold",
-                marginBottom: 15,
+                marginBottom: 20,
               }}
             >
               ₹{order.total}
             </Text>
 
+            {/* Status */}
             <Text
               style={{
-                fontSize: 18,
-                fontWeight: "bold",
-                marginBottom: 20,
-
+                fontSize: 22,
                 color:
-                  order.status === "Rejected"
-                    ? "red"
-                    : order.status === "Delivered"
+                  order.status ===
+                  "Delivered"
                     ? "green"
+                    : order.status ===
+                      "Rejected"
+                    ? "red"
                     : "orange",
+
+                fontWeight: "bold",
+                marginBottom: 25,
               }}
             >
               Status: {order.status}
             </Text>
 
-            {order.status === "Placed" && (
+            {/* Placed Buttons */}
+            {order.status ===
+              "Placed" && (
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  flexDirection:
+                    "row",
+
+                  justifyContent:
+                    "space-between",
                 }}
               >
                 <TouchableOpacity
                   onPress={() =>
-                    updateOrderStatus(
-                      order.id,
-                      "Accepted"
+                    handleAccept(
+                      order.id
                     )
                   }
                   style={{
-                    backgroundColor: "green",
-                    paddingVertical: 15,
-                    borderRadius: 10,
-                    width: "48%",
+                    backgroundColor:
+                      "green",
+
+                    padding: 18,
+
+                    borderRadius: 12,
+
+                    width: "47%",
                   }}
                 >
                   <Text
                     style={{
                       color: "white",
-                      textAlign: "center",
-                      fontWeight: "bold",
-                      fontSize: 16,
+
+                      textAlign:
+                        "center",
+
+                      fontSize: 20,
+
+                      fontWeight:
+                        "bold",
                     }}
                   >
                     Accept
@@ -166,24 +271,32 @@ export default function VendorOrdersScreen() {
 
                 <TouchableOpacity
                   onPress={() =>
-                    updateOrderStatus(
-                      order.id,
-                      "Rejected"
+                    handleReject(
+                      order.id
                     )
                   }
                   style={{
-                    backgroundColor: "red",
-                    paddingVertical: 15,
-                    borderRadius: 10,
-                    width: "48%",
+                    backgroundColor:
+                      "red",
+
+                    padding: 18,
+
+                    borderRadius: 12,
+
+                    width: "47%",
                   }}
                 >
                   <Text
                     style={{
                       color: "white",
-                      textAlign: "center",
-                      fontWeight: "bold",
-                      fontSize: 16,
+
+                      textAlign:
+                        "center",
+
+                      fontSize: 20,
+
+                      fontWeight:
+                        "bold",
                     }}
                   >
                     Reject
@@ -192,26 +305,35 @@ export default function VendorOrdersScreen() {
               </View>
             )}
 
-            {order.status === "Accepted" && (
+            {/* Accepted Button */}
+            {order.status ===
+              "Accepted" && (
               <TouchableOpacity
                 onPress={() =>
-                  updateOrderStatus(
-                    order.id,
-                    "Delivered"
+                  handleDelivered(
+                    order.id
                   )
                 }
                 style={{
-                  backgroundColor: "orange",
-                  paddingVertical: 15,
-                  borderRadius: 10,
+                  backgroundColor:
+                    "#0066cc",
+
+                  padding: 18,
+
+                  borderRadius: 12,
                 }}
               >
                 <Text
                   style={{
                     color: "white",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    fontSize: 16,
+
+                    textAlign:
+                      "center",
+
+                    fontSize: 20,
+
+                    fontWeight:
+                      "bold",
                   }}
                 >
                   Mark Delivered

@@ -7,9 +7,19 @@ import {
 } from "react-native";
 
 import { useState } from "react";
-import { vegetables } from "../data/vegetables";
 
-const units = ["KG", "Piece", "Bundle", "Dozen"];
+import { masterProducts } from "../data/masterProducts";
+
+import {
+  createProduct,
+} from "../services/productService";
+
+const units = [
+  "KG",
+  "Piece",
+  "Bundle",
+  "Dozen",
+];
 
 export default function VendorAddProductScreen() {
   const [selectedVegetable, setSelectedVegetable] =
@@ -18,53 +28,83 @@ export default function VendorAddProductScreen() {
   const [selectedUnit, setSelectedUnit] =
     useState("KG");
 
-  const [price, setPrice] = useState("");
+  const [price, setPrice] =
+    useState("");
 
   const [savedProducts, setSavedProducts] =
     useState<any[]>([]);
 
-  const handleSaveProduct = () => {
+  const handleSaveProduct = async () => {
     if (!selectedVegetable || !price) {
-      alert("Please select vegetable and enter price");
+      alert(
+        "Please select vegetable and enter price"
+      );
+
       return;
     }
 
     const newProduct = {
       id: Date.now().toString(),
-      vegetable: selectedVegetable.marathi,
+
+      vegetable:
+        selectedVegetable.marathi,
+
       unit: selectedUnit,
-      price: price,
+
+      price: Number(price),
+
       available: true,
+
+      vendorName:
+        "Fresh Vegetable Market",
+
+      locality: "JB Nagar",
+
+      createdAt: new Date(),
     };
 
-    setSavedProducts([...savedProducts, newProduct]);
+    await createProduct(newProduct);
+
+    setSavedProducts([
+      ...savedProducts,
+      newProduct,
+    ]);
+
+    alert("Product Saved");
 
     setSelectedVegetable(null);
+
     setSelectedUnit("KG");
+
     setPrice("");
   };
 
-  const toggleAvailability = (id: string) => {
-    const updatedProducts = savedProducts.map(
-      (product) => {
+  const toggleAvailability = (
+    id: string
+  ) => {
+    const updatedProducts =
+      savedProducts.map((product) => {
         if (product.id === id) {
           return {
             ...product,
-            available: !product.available,
+            available:
+              !product.available,
           };
         }
 
         return product;
-      }
-    );
+      });
 
     setSavedProducts(updatedProducts);
   };
 
-  const deleteProduct = (id: string) => {
-    const updatedProducts = savedProducts.filter(
-      (product) => product.id !== id
-    );
+  const deleteProduct = (
+    id: string
+  ) => {
+    const updatedProducts =
+      savedProducts.filter(
+        (product) => product.id !== id
+      );
 
     setSavedProducts(updatedProducts);
   };
@@ -106,10 +146,11 @@ export default function VendorAddProductScreen() {
           style={{
             flexDirection: "row",
             flexWrap: "wrap",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
           }}
         >
-          {vegetables.map((item) => (
+          {masterProducts.map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() =>
@@ -117,27 +158,36 @@ export default function VendorAddProductScreen() {
               }
               style={{
                 backgroundColor:
-                  selectedVegetable?.id === item.id
+                  selectedVegetable?.id ===
+                  item.id
                     ? "green"
                     : "#ffffff",
 
                 width: "48%",
+
                 paddingVertical: 20,
+
                 borderRadius: 12,
+
                 marginBottom: 15,
+
                 borderWidth: 1,
+
                 borderColor: "#ddd",
+
                 alignItems: "center",
               }}
             >
               <Text
                 style={{
                   color:
-                    selectedVegetable?.id === item.id
+                    selectedVegetable?.id ===
+                    item.id
                       ? "white"
                       : "black",
 
                   fontWeight: "bold",
+
                   fontSize: 22,
                 }}
               >
@@ -162,7 +212,8 @@ export default function VendorAddProductScreen() {
           style={{
             flexDirection: "row",
             flexWrap: "wrap",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
           }}
         >
           {units.map((item) => (
@@ -178,11 +229,17 @@ export default function VendorAddProductScreen() {
                     : "#ffffff",
 
                 width: "48%",
+
                 paddingVertical: 18,
+
                 borderRadius: 12,
+
                 marginBottom: 15,
+
                 borderWidth: 1,
+
                 borderColor: "#ddd",
+
                 alignItems: "center",
               }}
             >
@@ -194,6 +251,7 @@ export default function VendorAddProductScreen() {
                       : "black",
 
                   fontWeight: "bold",
+
                   fontSize: 18,
                 }}
               >
@@ -225,10 +283,15 @@ export default function VendorAddProductScreen() {
             onChangeText={setPrice}
             style={{
               backgroundColor: "#ffffff",
+
               padding: 18,
+
               borderRadius: 12,
+
               borderWidth: 1,
+
               borderColor: "#ddd",
+
               fontSize: 18,
             }}
           />
@@ -238,16 +301,22 @@ export default function VendorAddProductScreen() {
           onPress={handleSaveProduct}
           style={{
             backgroundColor: "green",
+
             padding: 20,
+
             borderRadius: 12,
+
             marginTop: 40,
           }}
         >
           <Text
             style={{
               color: "white",
+
               textAlign: "center",
+
               fontWeight: "bold",
+
               fontSize: 20,
             }}
           >
@@ -271,109 +340,155 @@ export default function VendorAddProductScreen() {
               My Products 🛒
             </Text>
 
-            {savedProducts.map((product) => (
-              <View
-                key={product.id}
-                style={{
-                  backgroundColor: "#ffffff",
-                  padding: 18,
-                  borderRadius: 12,
-                  marginBottom: 15,
-                  borderWidth: 1,
-                  borderColor: "#ddd",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 22,
-                    fontWeight: "bold",
-                    marginBottom: 8,
-                  }}
-                >
-                  {product.vegetable}
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: "green",
-                    fontWeight: "bold",
-                    marginBottom: 10,
-                  }}
-                >
-                  ₹{product.price} / {product.unit}
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginBottom: 15,
-                    color: product.available
-                      ? "green"
-                      : "red",
-
-                    fontWeight: "bold",
-                  }}
-                >
-                  {product.available
-                    ? "🟢 Available"
-                    : "🔴 Out of Stock"}
-                </Text>
-
+            {savedProducts.map(
+              (product) => (
                 <View
+                  key={product.id}
                   style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    backgroundColor:
+                      "#ffffff",
+
+                    padding: 18,
+
+                    borderRadius: 12,
+
+                    marginBottom: 15,
+
+                    borderWidth: 1,
+
+                    borderColor: "#ddd",
                   }}
                 >
-                  <TouchableOpacity
-                    onPress={() =>
-                      toggleAvailability(product.id)
-                    }
+                  <Text
                     style={{
-                      backgroundColor: "orange",
-                      paddingVertical: 12,
-                      paddingHorizontal: 20,
-                      borderRadius: 10,
-                      width: "48%",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "white",
-                        textAlign: "center",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Toggle Stock
-                    </Text>
-                  </TouchableOpacity>
+                      fontSize: 22,
 
-                  <TouchableOpacity
-                    onPress={() =>
-                      deleteProduct(product.id)
-                    }
-                    style={{
-                      backgroundColor: "red",
-                      paddingVertical: 12,
-                      paddingHorizontal: 20,
-                      borderRadius: 10,
-                      width: "48%",
+                      fontWeight: "bold",
+
+                      marginBottom: 8,
                     }}
                   >
-                    <Text
+                    {
+                      product.vegetable
+                    }
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 18,
+
+                      color: "green",
+
+                      fontWeight:
+                        "bold",
+
+                      marginBottom: 10,
+                    }}
+                  >
+                    ₹{product.price} /{" "}
+                    {product.unit}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 16,
+
+                      marginBottom: 15,
+
+                      color:
+                        product.available
+                          ? "green"
+                          : "red",
+
+                      fontWeight:
+                        "bold",
+                    }}
+                  >
+                    {product.available
+                      ? "🟢 Available"
+                      : "🔴 Out of Stock"}
+                  </Text>
+
+                  <View
+                    style={{
+                      flexDirection:
+                        "row",
+
+                      justifyContent:
+                        "space-between",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() =>
+                        toggleAvailability(
+                          product.id
+                        )
+                      }
                       style={{
-                        color: "white",
-                        textAlign: "center",
-                        fontWeight: "bold",
+                        backgroundColor:
+                          "orange",
+
+                        paddingVertical: 12,
+
+                        paddingHorizontal: 20,
+
+                        borderRadius: 10,
+
+                        width: "48%",
                       }}
                     >
-                      Delete
-                    </Text>
-                  </TouchableOpacity>
+                      <Text
+                        style={{
+                          color: "white",
+
+                          textAlign:
+                            "center",
+
+                          fontWeight:
+                            "bold",
+                        }}
+                      >
+                        Toggle Stock
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() =>
+                        deleteProduct(
+                          product.id
+                        )
+                      }
+                      style={{
+                        backgroundColor:
+                          "red",
+
+                        paddingVertical: 12,
+
+                        paddingHorizontal: 20,
+
+                        borderRadius: 10,
+
+                        width: "48%",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "white",
+
+                          textAlign:
+                            "center",
+
+                          fontWeight:
+                            "bold",
+                        }}
+                      >
+                        Delete
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
+              )
+            )}
           </View>
         )}
       </View>
