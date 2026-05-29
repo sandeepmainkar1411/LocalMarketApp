@@ -31,7 +31,7 @@ export default function CustomerDashboardScreen({
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(
-            "VendorList"
+            "SelectLocality"
           )
         }
         style={{

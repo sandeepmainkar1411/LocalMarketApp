@@ -31,15 +31,11 @@ export default function VendorAddProductScreen() {
   const [price, setPrice] =
     useState("");
 
-  const [savedProducts, setSavedProducts] =
-    useState<any[]>([]);
-
   const handleSaveProduct = async () => {
     if (!selectedVegetable || !price) {
       alert(
         "Please select vegetable and enter price"
       );
-
       return;
     }
 
@@ -65,48 +61,11 @@ export default function VendorAddProductScreen() {
 
     await createProduct(newProduct);
 
-    setSavedProducts([
-      ...savedProducts,
-      newProduct,
-    ]);
-
-    alert("Product Saved");
+    alert("Product Saved Successfully ✅");
 
     setSelectedVegetable(null);
-
     setSelectedUnit("KG");
-
     setPrice("");
-  };
-
-  const toggleAvailability = (
-    id: string
-  ) => {
-    const updatedProducts =
-      savedProducts.map((product) => {
-        if (product.id === id) {
-          return {
-            ...product,
-            available:
-              !product.available,
-          };
-        }
-
-        return product;
-      });
-
-    setSavedProducts(updatedProducts);
-  };
-
-  const deleteProduct = (
-    id: string
-  ) => {
-    const updatedProducts =
-      savedProducts.filter(
-        (product) => product.id !== id
-      );
-
-    setSavedProducts(updatedProducts);
   };
 
   return (
@@ -283,15 +242,10 @@ export default function VendorAddProductScreen() {
             onChangeText={setPrice}
             style={{
               backgroundColor: "#ffffff",
-
               padding: 18,
-
               borderRadius: 12,
-
               borderWidth: 1,
-
               borderColor: "#ddd",
-
               fontSize: 18,
             }}
           />
@@ -301,196 +255,23 @@ export default function VendorAddProductScreen() {
           onPress={handleSaveProduct}
           style={{
             backgroundColor: "green",
-
             padding: 20,
-
             borderRadius: 12,
-
             marginTop: 40,
+            marginBottom: 40,
           }}
         >
           <Text
             style={{
               color: "white",
-
               textAlign: "center",
-
               fontWeight: "bold",
-
               fontSize: 20,
             }}
           >
             Save Product
           </Text>
         </TouchableOpacity>
-
-        {savedProducts.length > 0 && (
-          <View
-            style={{
-              marginTop: 40,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 26,
-                fontWeight: "bold",
-                marginBottom: 20,
-              }}
-            >
-              My Products 🛒
-            </Text>
-
-            {savedProducts.map(
-              (product) => (
-                <View
-                  key={product.id}
-                  style={{
-                    backgroundColor:
-                      "#ffffff",
-
-                    padding: 18,
-
-                    borderRadius: 12,
-
-                    marginBottom: 15,
-
-                    borderWidth: 1,
-
-                    borderColor: "#ddd",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 22,
-
-                      fontWeight: "bold",
-
-                      marginBottom: 8,
-                    }}
-                  >
-                    {
-                      product.vegetable
-                    }
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 18,
-
-                      color: "green",
-
-                      fontWeight:
-                        "bold",
-
-                      marginBottom: 10,
-                    }}
-                  >
-                    ₹{product.price} /{" "}
-                    {product.unit}
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 16,
-
-                      marginBottom: 15,
-
-                      color:
-                        product.available
-                          ? "green"
-                          : "red",
-
-                      fontWeight:
-                        "bold",
-                    }}
-                  >
-                    {product.available
-                      ? "🟢 Available"
-                      : "🔴 Out of Stock"}
-                  </Text>
-
-                  <View
-                    style={{
-                      flexDirection:
-                        "row",
-
-                      justifyContent:
-                        "space-between",
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() =>
-                        toggleAvailability(
-                          product.id
-                        )
-                      }
-                      style={{
-                        backgroundColor:
-                          "orange",
-
-                        paddingVertical: 12,
-
-                        paddingHorizontal: 20,
-
-                        borderRadius: 10,
-
-                        width: "48%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "white",
-
-                          textAlign:
-                            "center",
-
-                          fontWeight:
-                            "bold",
-                        }}
-                      >
-                        Toggle Stock
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() =>
-                        deleteProduct(
-                          product.id
-                        )
-                      }
-                      style={{
-                        backgroundColor:
-                          "red",
-
-                        paddingVertical: 12,
-
-                        paddingHorizontal: 20,
-
-                        borderRadius: 10,
-
-                        width: "48%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "white",
-
-                          textAlign:
-                            "center",
-
-                          fontWeight:
-                            "bold",
-                        }}
-                      >
-                        Delete
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )
-            )}
-          </View>
-        )}
       </View>
     </ScrollView>
   );

@@ -17,6 +17,8 @@ import VendorOrdersScreen from "../screens/VendorOrdersScreen";
 
 import CartScreen from "../screens/CartScreen";
 import OrderSuccessScreen from "../screens/OrderSuccessScreen";
+import VendorEditProductScreen from "../screens/VendorEditProductScreen";
+import SelectLocalityScreen from "../screens/SelectLocalityScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -58,6 +60,13 @@ export default function AppNavigator() {
         }
       />
 
+      <Stack.Screen
+        name="SelectLocality"
+         component={
+           SelectLocalityScreen
+         }
+      />
+
       {/* VENDOR */}
       <Stack.Screen
         name="VendorLogin"
@@ -77,6 +86,13 @@ export default function AppNavigator() {
         name="VendorAddProduct"
         component={
           VendorAddProductScreen
+        }
+      />
+
+      <Stack.Screen
+        name="VendorEditProduct"
+        component={
+          VendorEditProductScreen
         }
       />
 
@@ -122,6 +138,8 @@ export default function AppNavigator() {
           OrderSuccessScreen
         }
       />
+
+
     </Stack.Navigator>
   );
 }

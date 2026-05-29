@@ -3,9 +3,14 @@ import {
   addDoc,
   getDocs,
   onSnapshot,
+  updateDoc,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebaseConfig";
+
+/* CREATE PRODUCT */
 
 export const createProduct = async (
   productData: any
@@ -29,6 +34,8 @@ export const createProduct = async (
     );
   }
 };
+
+/* FETCH PRODUCTS */
 
 export const fetchProducts = async () => {
   try {
@@ -56,6 +63,8 @@ export const fetchProducts = async () => {
   }
 };
 
+/* REALTIME PRODUCTS */
+
 export const subscribeToProducts = (
   callback: any
 ) => {
@@ -74,4 +83,59 @@ export const subscribeToProducts = (
       callback(products);
     }
   );
+};
+
+/* UPDATE PRODUCT */
+
+export const updateProduct = async (
+  firestoreId: string,
+  productData: any
+) => {
+  try {
+    const productRef = doc(
+      db,
+      "products",
+      firestoreId
+    );
+
+    await updateDoc(
+      productRef,
+      productData
+    );
+
+    console.log(
+      "Product Updated"
+    );
+  } catch (error) {
+    console.log(
+      "Update Product Error:",
+      error
+    );
+  }
+};
+
+/* DELETE PRODUCT */
+
+export const deleteProduct = async (
+  firestoreId: string
+) => {
+  try {
+    await deleteDoc(
+      doc(
+        db,
+        "products",
+        firestoreId
+      )
+    );
+
+    console.log(
+      "Product Deleted:",
+      firestoreId
+    );
+  } catch (error) {
+    console.log(
+      "Delete Product Error:",
+      error
+    );
+  }
 };

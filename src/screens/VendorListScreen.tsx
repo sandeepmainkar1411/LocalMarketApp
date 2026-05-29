@@ -30,7 +30,18 @@ const vendors = [
 
 export default function VendorListScreen({
   navigation,
+  route,
 }: any) {
+  const selectedLocality =
+    route?.params?.locality;
+
+  const filteredVendors =
+    vendors.filter(
+      (vendor) =>
+        vendor.locality ===
+        selectedLocality
+    );
+
   return (
     <View
       style={{
@@ -43,15 +54,40 @@ export default function VendorListScreen({
         style={{
           fontSize: 28,
           fontWeight: "bold",
-          marginBottom: 20,
+          marginBottom: 10,
           textAlign: "center",
         }}
       >
         Vegetable Vendors
       </Text>
 
+      <Text
+        style={{
+          fontSize: 18,
+          textAlign: "center",
+          color: "gray",
+          marginBottom: 20,
+        }}
+      >
+        📍 {selectedLocality}
+      </Text>
+
+      {filteredVendors.length === 0 && (
+        <Text
+          style={{
+            textAlign: "center",
+            fontSize: 18,
+            color: "red",
+            marginTop: 40,
+          }}
+        >
+          No vendors available in
+          this locality
+        </Text>
+      )}
+
       <FlatList
-        data={vendors}
+        data={filteredVendors}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -88,6 +124,16 @@ export default function VendorListScreen({
               }}
             >
               {item.category}
+            </Text>
+
+            <Text
+              style={{
+                color: "green",
+                marginTop: 5,
+                fontWeight: "bold",
+              }}
+            >
+              📍 {item.locality}
             </Text>
           </TouchableOpacity>
         )}

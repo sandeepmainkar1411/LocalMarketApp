@@ -2,75 +2,269 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
+  Alert,
 } from "react-native";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  subscribeToProducts,
+  deleteProduct,
+} from "../services/productService";
 
 export default function VendorDashboardScreen({
   navigation,
 }: any) {
+  const [products, setProducts] =
+    useState<any[]>([]);
+
+  useEffect(() => {
+    const unsubscribe =
+      subscribeToProducts(
+        (allProducts: any[]) => {
+          setProducts(allProducts);
+        }
+      );
+
+    return unsubscribe;
+  }, []);
+
+  const handleDelete = async (
+    firestoreId: string
+  ) => {
+    Alert.alert(
+      "Delete Product",
+      "Are you sure?",
+      [
+        {
+          text: "Cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteProduct(
+              firestoreId
+            );
+          },
+        },
+      ]
+    );
+  };
+
   return (
-    <View
+    <ScrollView
       style={{
         flex: 1,
-        justifyContent: "center",
-        padding: 20,
-        backgroundColor: "#f5f5f5",
+        backgroundColor:
+          "#f5f5f5",
       }}
     >
-      <Text
+      <View
         style={{
-          fontSize: 32,
-          fontWeight: "bold",
-          textAlign: "center",
-          marginBottom: 40,
-        }}
-      >
-        Vendor Dashboard 🛒
-      </Text>
-
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("VendorAddProduct")
-        }
-        style={{
-          backgroundColor: "green",
-          padding: 18,
-          borderRadius: 12,
-          marginBottom: 20,
+          padding: 20,
         }}
       >
         <Text
           style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 18,
+            fontSize: 32,
             fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: 30,
           }}
         >
-          Manage Products
+          Vendor Dashboard 🛒
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("VendorOrders")
-        }
-        style={{
-          backgroundColor: "orange",
-          padding: 18,
-          borderRadius: 12,
-        }}
-      >
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              "VendorAddProduct"
+            )
+          }
+          style={{
+            backgroundColor:
+              "green",
+            padding: 18,
+            borderRadius: 12,
+            marginBottom: 15,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign:
+                "center",
+              fontSize: 18,
+              fontWeight: "bold",
+            }}
+          >
+            Add Product
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              "VendorOrders"
+            )
+          }
+          style={{
+            backgroundColor:
+              "orange",
+            padding: 18,
+            borderRadius: 12,
+            marginBottom: 30,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign:
+                "center",
+              fontSize: 18,
+              fontWeight: "bold",
+            }}
+          >
+            View Orders
+          </Text>
+        </TouchableOpacity>
+
         <Text
           style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: "bold",
+            marginBottom: 20,
           }}
         >
-          View Orders
+          My Products
         </Text>
-      </TouchableOpacity>
-    </View>
+
+        {products.map(
+          (product) => (
+            <View
+              key={
+                product.firestoreId
+              }
+              style={{
+                backgroundColor:
+                  "white",
+                padding: 15,
+                borderRadius: 10,
+                marginBottom: 15,
+                borderWidth: 1,
+                borderColor:
+                  "#ddd",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontWeight:
+                    "bold",
+                }}
+              >
+                {
+                  product.vegetable
+                }
+              </Text>
+
+              <Text
+                style={{
+                  color:
+                    "green",
+                  fontSize: 18,
+                  marginTop: 5,
+                }}
+              >
+                ₹
+                {product.price}
+                /
+                {
+                  product.unit
+                }
+              </Text>
+
+              <Text
+                style={{
+                  marginTop: 5,
+                }}
+              >
+                {product.locality}
+              </Text>
+
+              <View
+                style={{
+                  flexDirection:
+                    "row",
+                  marginTop: 15,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate(
+                      "VendorEditProduct",
+                      {
+                        product,
+                      }
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#0066cc",
+                    flex: 1,
+                    padding: 12,
+                    borderRadius: 10,
+                    marginRight: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={async () => {
+                    console.log(
+                      "Deleting:",
+                      product.firestoreId
+                    );
+
+                    await deleteProduct(
+                      product.firestoreId
+                    );
+                  }}
+                  style={{
+                    backgroundColor: "red",
+                    flex: 1,
+                    padding: 12,
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Delete
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )
+        )}
+      </View>
+    </ScrollView>
   );
 }
