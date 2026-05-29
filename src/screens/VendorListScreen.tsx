@@ -5,28 +5,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const vendors = [
-  {
-    id: "1",
-    name: "Fresh Vegetable Market",
-    category: "Fresh Vegetables",
-    locality: "JB Nagar",
-  },
+import {
+  useEffect,
+  useState,
+} from "react";
 
-  {
-    id: "2",
-    name: "Organic Veggie Store",
-    category: "Organic Vegetables",
-    locality: "Andheri",
-  },
-
-  {
-    id: "3",
-    name: "Farm Direct Market",
-    category: "Farm Fresh Produce",
-    locality: "Powai",
-  },
-];
+import {
+  subscribeToProducts,
+} from "../services/productService";
 
 export default function VendorListScreen({
   navigation,
@@ -35,12 +21,55 @@ export default function VendorListScreen({
   const selectedLocality =
     route?.params?.locality;
 
-  const filteredVendors =
-    vendors.filter(
-      (vendor) =>
-        vendor.locality ===
-        selectedLocality
-    );
+  const [vendors, setVendors] =
+    useState<any[]>([]);
+
+  useEffect(() => {
+    const unsubscribe =
+      subscribeToProducts(
+        (products: any[]) => {
+          const vendorMap =
+            new Map();
+
+          products.forEach(
+            (product) => {
+              if (
+                product.available ===
+                  true &&
+                product.locality ===
+                  selectedLocality
+              ) {
+                if (
+                  !vendorMap.has(
+                    product.vendorName
+                  )
+                ) {
+                  vendorMap.set(
+                    product.vendorName,
+                    {
+                      name:
+                        product.vendorName,
+
+                      locality:
+                        product.locality,
+                    }
+                  );
+                }
+              }
+            }
+          );
+
+          setVendors(
+            Array.from(
+              vendorMap.values()
+            )
+          );
+        }
+      );
+
+    return () =>
+      unsubscribe();
+  }, [selectedLocality]);
 
   return (
     <View
@@ -72,7 +101,7 @@ export default function VendorListScreen({
         📍 {selectedLocality}
       </Text>
 
-      {filteredVendors.length === 0 && (
+      {vendors.length === 0 && (
         <Text
           style={{
             textAlign: "center",
@@ -87,8 +116,13 @@ export default function VendorListScreen({
       )}
 
       <FlatList
-        data={filteredVendors}
-        keyExtractor={(item) => item.id}
+        data={vendors}
+        keyExtractor={(
+          item,
+          index
+        ) =>
+          `${item.name}-${index}`
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() =>
@@ -115,15 +149,6 @@ export default function VendorListScreen({
               }}
             >
               {item.name}
-            </Text>
-
-            <Text
-              style={{
-                color: "gray",
-                marginTop: 5,
-              }}
-            >
-              {item.category}
             </Text>
 
             <Text

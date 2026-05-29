@@ -1,3 +1,4 @@
+                        
 import {
   View,
   Text,
@@ -87,11 +88,11 @@ export default function VendorDetailsScreen({
                 product.available ===
                   true
             );
-  
+
           setProducts(vendorProducts);
         }
       );
-  
+
     return () => unsubscribe();
   }, []);
 
