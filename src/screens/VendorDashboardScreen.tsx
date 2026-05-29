@@ -16,6 +16,10 @@ import {
   deleteProduct,
 } from "../services/productService";
 
+import {
+  fetchVendors,
+} from "../services/vendorService";
+
 export default function VendorDashboardScreen({
   navigation,
 }: any) {
@@ -32,6 +36,17 @@ export default function VendorDashboardScreen({
 
     return unsubscribe;
   }, []);
+
+  const testVendors = async () => {
+    const vendors =
+      await fetchVendors();
+
+    console.log(
+      "VENDORS FROM FIREBASE:"
+    );
+
+    console.log(vendors);
+  };
 
   const handleDelete = async (
     firestoreId: string
@@ -118,7 +133,7 @@ export default function VendorDashboardScreen({
               "orange",
             padding: 18,
             borderRadius: 12,
-            marginBottom: 30,
+            marginBottom: 15,
           }}
         >
           <Text
@@ -131,6 +146,29 @@ export default function VendorDashboardScreen({
             }}
           >
             View Orders
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={testVendors}
+          style={{
+            backgroundColor:
+              "purple",
+            padding: 18,
+            borderRadius: 12,
+            marginBottom: 30,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign:
+                "center",
+              fontSize: 18,
+              fontWeight: "bold",
+            }}
+          >
+            Test Vendors
           </Text>
         </TouchableOpacity>
 
@@ -214,7 +252,8 @@ export default function VendorDashboardScreen({
                     )
                   }
                   style={{
-                    backgroundColor: "#0066cc",
+                    backgroundColor:
+                      "#0066cc",
                     flex: 1,
                     padding: 12,
                     borderRadius: 10,
@@ -224,8 +263,10 @@ export default function VendorDashboardScreen({
                   <Text
                     style={{
                       color: "white",
-                      textAlign: "center",
-                      fontWeight: "bold",
+                      textAlign:
+                        "center",
+                      fontWeight:
+                        "bold",
                     }}
                   >
                     Edit
@@ -233,18 +274,14 @@ export default function VendorDashboardScreen({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={async () => {
-                    console.log(
-                      "Deleting:",
+                  onPress={() =>
+                    handleDelete(
                       product.firestoreId
-                    );
-
-                    await deleteProduct(
-                      product.firestoreId
-                    );
-                  }}
+                    )
+                  }
                   style={{
-                    backgroundColor: "red",
+                    backgroundColor:
+                      "red",
                     flex: 1,
                     padding: 12,
                     borderRadius: 10,
@@ -253,8 +290,10 @@ export default function VendorDashboardScreen({
                   <Text
                     style={{
                       color: "white",
-                      textAlign: "center",
-                      fontWeight: "bold",
+                      textAlign:
+                        "center",
+                      fontWeight:
+                        "bold",
                     }}
                   >
                     Delete
