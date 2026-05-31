@@ -43,7 +43,7 @@ export default function VendorLoginScreen({
 
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("VendorDashboard")
+          navigation.navigate("VendorProfile")
         }
         style={{
           backgroundColor: "green",

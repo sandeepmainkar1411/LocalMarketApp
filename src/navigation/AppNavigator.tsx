@@ -19,6 +19,7 @@ import CartScreen from "../screens/CartScreen";
 import OrderSuccessScreen from "../screens/OrderSuccessScreen";
 import VendorEditProductScreen from "../screens/VendorEditProductScreen";
 import SelectLocalityScreen from "../screens/SelectLocalityScreen";
+import VendorProfileScreen from "../screens/VendorProfileScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -72,6 +73,13 @@ export default function AppNavigator() {
         name="VendorLogin"
         component={
           VendorLoginScreen
+        }
+      />
+
+      <Stack.Screen
+        name="VendorProfile"
+        component={
+          VendorProfileScreen
         }
       />
 
