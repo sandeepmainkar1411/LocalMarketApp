@@ -10,6 +10,8 @@ import { useState } from "react";
 
 import {
   createVendor,
+  vendorExists,
+  mobileExists,
 } from "../services/vendorService";
 
 import {
@@ -49,7 +51,43 @@ export default function VendorProfileScreen({
       return;
     }
 
-    try {
+    console.log(
+      "Checking Vendor:",
+      vendorName,
+      locality
+    );
+
+    try {const exists =
+      await vendorExists(
+        vendorName,
+        locality
+      );
+
+      if (exists) {
+        console.log(
+          "DUPLICATE VENDOR FOUND"
+        );
+      
+        alert(
+          `${vendorName} already exists in ${locality}`
+        );
+      
+        return;
+      }
+      const mobileAlreadyExists =
+        await mobileExists(
+          mobile
+        );
+
+      if (
+        mobileAlreadyExists
+      ) {
+        alert(
+          `Mobile number ${mobile} is already registered`
+        );
+
+        return;
+      }
       await createVendor({
         vendorName,
         ownerName,
