@@ -15,7 +15,14 @@ import {
   updateOrder,
 } from "../services/orderService";
 
-export default function VendorOrdersScreen() {
+export default function VendorOrdersScreen({
+  route,
+}: any) {
+  const vendor =
+  route?.params?.vendor;
+
+const vendorName =
+  vendor?.vendorName || "";
   const [vendorOrders, setVendorOrders] =
     useState<any[]>([]);
 
@@ -23,7 +30,16 @@ export default function VendorOrdersScreen() {
     const unsubscribe =
       subscribeToOrders(
         (ordersData: any[]) => {
-          setVendorOrders(ordersData);
+          const filteredOrders =
+  ordersData.filter(
+    (order) =>
+      order.vendorName ===
+      vendorName
+  );
+
+setVendorOrders(
+  filteredOrders
+);
         }
       );
 
@@ -103,15 +119,25 @@ export default function VendorOrdersScreen() {
             }}
           >
             {/* Customer Name */}
-            <Text
-              style={{
-                fontSize: 28,
-                fontWeight: "bold",
-                marginBottom: 15,
-              }}
-            >
-              👤 {order.customer}
-            </Text>
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: "bold",
+              marginBottom: 15,
+            }}
+          >
+            👤 {order.customer}
+          </Text>
+
+          <Text
+            style={{
+              color: "gray",
+              marginBottom: 10,
+              fontSize: 16,
+            }}
+          >
+            📍 {order.locality}
+          </Text>
 
             {/* Products */}
             <View

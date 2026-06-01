@@ -157,7 +157,10 @@ export default function VendorDashboardScreen({
         <TouchableOpacity
           onPress={() =>
             navigation.navigate(
-              "VendorOrders"
+              "VendorOrders",
+              {
+                vendor,
+              }
             )
           }
           style={{

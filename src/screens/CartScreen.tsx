@@ -492,23 +492,27 @@ export default function CartScreen({
                 }
 
                 const newOrder = {
-                  customer:
-                    "Rahul Sharma",
-
+                  customer: "Rahul Sharma",
+                
+                  vendorName:
+                    cartItems[0]?.vendorName || "",
+                
+                  locality:
+                    cartItems[0]?.locality || "",
+                
                   items: cartItems,
-
-                  total:
-                    totalAmount,
-
+                
+                  total: totalAmount,
+                
                   address: {
                     building,
                     flat,
                     landmark,
                     mobile,
                   },
-
+                
                   status: "Placed",
-
+                
                   createdAt:
                     new Date(),
                 };

@@ -148,18 +148,24 @@ export default function VendorDetailsScreen({
     } else {
       const newItem = {
         id: product.id,
-
+      
         name: product.vegetable,
-
+      
         quantity,
-
+      
         displayQuantity,
-
+      
         price: calculatedPrice,
-
+      
         basePrice: product.price,
-
+      
         unit: product.unit,
+      
+        vendorName:
+          product.vendorName,
+      
+        locality:
+          product.locality,
       };
 
       updatedCart = [
