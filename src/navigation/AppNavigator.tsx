@@ -22,6 +22,11 @@ import SelectLocalityScreen from "../screens/SelectLocalityScreen";
 import VendorProfileScreen from "../screens/VendorProfileScreen";
 import VendorTermsScreen from "../screens/VendorTermsScreen";
 import VendorMobileLookupScreen from "../screens/VendorMobileLookupScreen";
+import VendorProfileEditScreen from "../screens/VendorProfileEditScreen";
+import AdminLoginScreen from "../screens/AdminLoginScreen";
+import AdminDashboardScreen from "../screens/AdminDashboardScreen";
+import AdminManageVendorsScreen from "../screens/AdminManageVendorsScreen";
+import AdminManageLocalitiesScreen from "../screens/AdminManageLocalitiesScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -160,6 +165,33 @@ export default function AppNavigator() {
         name="OrderSuccess"
         component={
           OrderSuccessScreen
+        }
+      />
+
+      <Stack.Screen
+        name="VendorProfileEdit"
+        component={VendorProfileEditScreen}
+      />
+
+      <Stack.Screen
+        name="AdminLogin"
+        component={AdminLoginScreen}
+      />
+
+      <Stack.Screen
+        name="AdminDashboard"
+        component={AdminDashboardScreen}
+      />
+
+      <Stack.Screen
+        name="AdminManageVendors"
+        component={AdminManageVendorsScreen}
+      />
+
+      <Stack.Screen
+        name="AdminManageLocalities"
+        component={
+          AdminManageLocalitiesScreen
         }
       />
 

@@ -158,3 +158,38 @@ export const subscribeToVendors = (
     }
   );
 };
+import {
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+export const updateVendor =
+  async (
+    firestoreId: string,
+    vendorData: any
+  ) => {
+    try {
+      const vendorRef = doc(
+        db,
+        "vendors",
+        firestoreId
+      );
+
+      await updateDoc(
+        vendorRef,
+        vendorData
+      );
+
+      console.log(
+        "Vendor Updated"
+      );
+
+      return true;
+    } catch (error) {
+      console.log(
+        "Update Vendor Error:",
+        error
+      );
+
+      return false;
+    }
+  };

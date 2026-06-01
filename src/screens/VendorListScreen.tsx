@@ -14,6 +14,10 @@ import {
   subscribeToProducts,
 } from "../services/productService";
 
+import {
+  fetchVendors,
+} from "../services/vendorService";
+
 export default function VendorListScreen({
   navigation,
   route,
@@ -25,50 +29,71 @@ export default function VendorListScreen({
     useState<any[]>([]);
 
   useEffect(() => {
-    const unsubscribe =
-      subscribeToProducts(
-        (products: any[]) => {
-          const vendorMap =
-            new Map();
+    const loadData = async () => {
+      const allVendors =
+        await fetchVendors();
 
-          products.forEach(
-            (product) => {
-              if (
-                product.available ===
-                  true &&
-                product.locality ===
-                  selectedLocality
-              ) {
+      const activeVendorNames =
+        allVendors
+          .filter(
+            (vendor) =>
+              vendor.active ===
+              true
+          )
+          .map(
+            (vendor) =>
+              vendor.vendorName
+          );
+
+      const unsubscribe =
+        subscribeToProducts(
+          (products: any[]) => {
+            const vendorMap =
+              new Map();
+
+            products.forEach(
+              (product) => {
                 if (
-                  !vendorMap.has(
+                  product.available ===
+                    true &&
+                  product.locality ===
+                    selectedLocality &&
+                  activeVendorNames.includes(
                     product.vendorName
                   )
                 ) {
-                  vendorMap.set(
-                    product.vendorName,
-                    {
-                      name:
-                        product.vendorName,
+                  if (
+                    !vendorMap.has(
+                      product.vendorName
+                    )
+                  ) {
+                    vendorMap.set(
+                      product.vendorName,
+                      {
+                        name:
+                          product.vendorName,
 
-                      locality:
-                        product.locality,
-                    }
-                  );
+                        locality:
+                          product.locality,
+                      }
+                    );
+                  }
                 }
               }
-            }
-          );
+            );
 
-          setVendors(
-            Array.from(
-              vendorMap.values()
-            )
-          );
-        }
-      );
+            setVendors(
+              Array.from(
+                vendorMap.values()
+              )
+            );
+          }
+        );
 
-    return () =>
-      unsubscribe();
+      return unsubscribe;
+    };
+
+    loadData();
   }, [selectedLocality]);
 
   return (
@@ -76,7 +101,8 @@ export default function VendorListScreen({
       style={{
         flex: 1,
         padding: 20,
-        backgroundColor: "#f5f5f5",
+        backgroundColor:
+          "#f5f5f5",
       }}
     >
       <Text
@@ -134,18 +160,21 @@ export default function VendorListScreen({
               )
             }
             style={{
-              backgroundColor: "#fff",
+              backgroundColor:
+                "#fff",
               padding: 20,
               borderRadius: 10,
               marginBottom: 15,
               borderWidth: 1,
-              borderColor: "#ddd",
+              borderColor:
+                "#ddd",
             }}
           >
             <Text
               style={{
                 fontSize: 20,
-                fontWeight: "bold",
+                fontWeight:
+                  "bold",
               }}
             >
               {item.name}
@@ -155,7 +184,8 @@ export default function VendorListScreen({
               style={{
                 color: "green",
                 marginTop: 5,
-                fontWeight: "bold",
+                fontWeight:
+                  "bold",
               }}
             >
               📍 {item.locality}
