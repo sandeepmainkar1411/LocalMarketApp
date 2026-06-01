@@ -22,7 +22,16 @@ import {
 
 export default function VendorDashboardScreen({
   navigation,
+  route,
 }: any) {
+  const vendor =
+    route?.params?.vendor;
+
+  const vendorName =
+    vendor?.vendorName ||
+    vendor?.name ||
+    "";
+
   const [products, setProducts] =
     useState<any[]>([]);
 
@@ -30,12 +39,22 @@ export default function VendorDashboardScreen({
     const unsubscribe =
       subscribeToProducts(
         (allProducts: any[]) => {
-          setProducts(allProducts);
+
+          const myProducts =
+            allProducts.filter(
+              (product) =>
+                product.vendorName ===
+                vendorName
+            );
+
+          setProducts(
+            myProducts
+          );
         }
       );
 
     return unsubscribe;
-  }, []);
+  }, [vendorName]);
 
   const testVendors = async () => {
     const vendors =
@@ -89,6 +108,16 @@ export default function VendorDashboardScreen({
             fontSize: 32,
             fontWeight: "bold",
             textAlign: "center",
+          }}
+        >
+          {vendorName}
+        </Text>
+
+        <Text
+          style={{
+            textAlign: "center",
+            color: "gray",
+            marginTop: 5,
             marginBottom: 30,
           }}
         >
@@ -98,7 +127,10 @@ export default function VendorDashboardScreen({
         <TouchableOpacity
           onPress={() =>
             navigation.navigate(
-              "VendorAddProduct"
+              "VendorAddProduct",
+              {
+                vendor,
+              }
             )
           }
           style={{
@@ -181,6 +213,19 @@ export default function VendorDashboardScreen({
         >
           My Products
         </Text>
+
+        {products.length === 0 && (
+          <Text
+            style={{
+              textAlign: "center",
+              color: "gray",
+              marginTop: 20,
+              marginBottom: 20,
+            }}
+          >
+            No products found
+          </Text>
+        )}
 
         {products.map(
           (product) => (

@@ -21,7 +21,20 @@ const units = [
   "Dozen",
 ];
 
-export default function VendorAddProductScreen() {
+export default function VendorAddProductScreen({
+  route,
+}: any) {
+
+  const vendor =
+  route?.params?.vendor;
+
+const vendorName =
+  vendor?.vendorName ||
+  vendor?.name ||
+  "";
+
+const locality =
+  vendor?.locality || "";
   const [selectedVegetable, setSelectedVegetable] =
     useState<any>(null);
 
@@ -39,25 +52,29 @@ export default function VendorAddProductScreen() {
       return;
     }
 
-    const newProduct = {
-      id: Date.now().toString(),
-
+  const newProduct = {
+    id: Date.now().toString(),
+    
       vegetable:
         selectedVegetable.marathi,
-
+    
       unit: selectedUnit,
-
+    
       price: Number(price),
-
+    
       available: true,
-
-      vendorName:
-        "Fresh Vegetable Market",
-
-      locality: "JB Nagar",
-
+    
+      vendorName,
+    
+      locality,
+    
       createdAt: new Date(),
     };
+
+    console.log(
+      "PRODUCT TO SAVE:",
+      newProduct
+    );
 
     await createProduct(newProduct);
 

@@ -21,6 +21,7 @@ import VendorEditProductScreen from "../screens/VendorEditProductScreen";
 import SelectLocalityScreen from "../screens/SelectLocalityScreen";
 import VendorProfileScreen from "../screens/VendorProfileScreen";
 import VendorTermsScreen from "../screens/VendorTermsScreen";
+import VendorMobileLookupScreen from "../screens/VendorMobileLookupScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -74,6 +75,13 @@ export default function AppNavigator() {
         name="VendorLogin"
         component={
           VendorLoginScreen
+        }
+      />
+
+      <Stack.Screen
+        name="VendorMobileLookup"
+        component={
+          VendorMobileLookupScreen
         }
       />
 
