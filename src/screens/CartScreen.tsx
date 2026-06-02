@@ -94,14 +94,16 @@ export default function CartScreen({
   };
 
   const totalAmount =
-    cartItems.reduce(
-      (
-        total: number,
-        item: any
-      ) =>
-        total + item.price,
-      0
-    );
+  cartItems.reduce(
+    (
+      total: number,
+      item: any
+    ) =>
+      total +
+      item.price *
+        item.quantity,
+    0
+  );
 
   return (
     <ScrollView
@@ -192,16 +194,13 @@ export default function CartScreen({
               <Text
                 style={{
                   fontSize: 18,
-
                   color: "green",
-
-                  fontWeight:
-                    "bold",
-
+                  fontWeight: "bold",
                   marginBottom: 15,
                 }}
               >
-                ₹{item.price}
+                ₹{item.price} × {item.quantity}
+                = ₹{item.price * item.quantity}
               </Text>
 
               <View
@@ -526,19 +525,19 @@ export default function CartScreen({
                 
                 await createNotification({
                   vendorName:
-                    cartItems[0]?.vendorName,
+                    cartItems[0]?.vendorName || "",
                 
                   customer:
-                    customerName,
+                    "Rahul Sharma",
                 
                   mobile:
-                    customerMobile,
+                    mobile,
                 
                   locality:
-                    locality,
+                    cartItems[0]?.locality || "",
                 
                   address:
-                    buildingName,
+                    building,
                 
                   items:
                     cartItems,
@@ -549,10 +548,13 @@ export default function CartScreen({
                   title:
                     "New Order Received",
                 
+                  message:
+                    `Rahul Sharma placed an order worth ₹${totalAmount}`,
+                
                   read: false,
                 
                   createdAt:
-                    new Date(),
+                    new Date().toISOString(),
                 });
 
                 navigation.navigate(

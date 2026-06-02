@@ -80,16 +80,16 @@ export default function AdminDashboardScreen({
         </Text>
       </TouchableOpacity>
 
-      {/* Complaints */}
+      {/* Customer Complaints */}
 
       <TouchableOpacity
         onPress={() =>
-          console.log(
-            "Complaints Screen Coming Soon"
+          navigation.navigate(
+            "AdminComplaints"
           )
         }
         style={{
-          backgroundColor: "#ff9800",
+          backgroundColor: "#f44336",
           padding: 20,
           borderRadius: 12,
           marginBottom: 15,
@@ -103,7 +103,7 @@ export default function AdminDashboardScreen({
             fontWeight: "bold",
           }}
         >
-          Complaints
+          Customer Complaints
         </Text>
       </TouchableOpacity>
 

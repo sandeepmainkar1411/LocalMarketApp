@@ -1,8 +1,9 @@
 import {
-    View,
-    Text,
-    ScrollView,
-  } from "react-native";
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
   
   import {
     useEffect,
@@ -13,7 +14,9 @@ import {
     subscribeToOrders,
   } from "../services/orderService";
   
-  export default function CustomerOrdersScreen() {
+  export default function CustomerOrdersScreen({
+    navigation,
+  }: any) {
     const [orders, setOrders] =
       useState<any[]>([]);
   
@@ -107,15 +110,14 @@ import {
                     index: number
                   ) => (
                     <Text
-                      key={index}
-                      style={{
-                        fontSize: 18,
-                        marginBottom: 5,
-                      }}
-                    >
-                      🥬 {item.name} -{" "}
-                      {item.displayQuantity}
-                    </Text>
+                    key={index}
+                    style={{
+                      fontSize: 18,
+                      marginBottom: 5,
+                    }}
+                  >
+                    🥬 {item.name} - {item.quantity} KG
+                  </Text>
                   )
                 )}
               </View>
@@ -190,6 +192,42 @@ import {
               >
                 Status: {order.status}
               </Text>
+
+              {order.status ===
+            "Delivered" && (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate(
+                  "CustomerComplaint",
+                  {
+                    order,
+                  }
+                )
+              }
+              style={{
+                backgroundColor:
+                  "#f44336",
+
+                padding: 15,
+
+                borderRadius: 10,
+
+                marginTop: 15,
+              }}
+            >
+              <Text
+                style={{
+                  color: "white",
+                  textAlign:
+                    "center",
+                  fontWeight:
+                    "bold",
+                }}
+              >
+                Report Complaint
+              </Text>
+            </TouchableOpacity>
+          )}
             </View>
           ))}
         </View>

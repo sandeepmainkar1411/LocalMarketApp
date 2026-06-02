@@ -29,6 +29,8 @@ import AdminManageVendorsScreen from "../screens/AdminManageVendorsScreen";
 import AdminManageLocalitiesScreen from "../screens/AdminManageLocalitiesScreen";
 import VendorApprovalPendingScreen from "../screens/VendorApprovalPendingScreen";
 import VendorNotificationsScreen from "../screens/VendorNotificationsScreen";
+import CustomerComplaintScreen from "../screens/CustomerComplaintScreen";
+import AdminComplaintsScreen from "../screens/AdminComplaintsScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -209,6 +211,16 @@ export default function AppNavigator() {
         component={
           VendorNotificationsScreen
         }
+      />
+
+      <Stack.Screen
+        name="CustomerComplaint"
+        component={CustomerComplaintScreen}
+      />
+
+      <Stack.Screen
+        name="AdminComplaints"
+        component={AdminComplaintsScreen}
       />
 
 
