@@ -4,9 +4,13 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 
-import { useState } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
 
 import {
   createVendor,
@@ -15,8 +19,8 @@ import {
 } from "../services/vendorService";
 
 import {
-  LOCALITIES,
-} from "../constants/localities";
+  subscribeToLocalities,
+} from "../services/localityService";
 
 export default function VendorProfileScreen({
   navigation,
@@ -36,6 +40,20 @@ export default function VendorProfileScreen({
   const [address, setAddress] =
     useState("");
 
+  const [localities, setLocalities] =
+    useState<any[]>([]);
+
+  useEffect(() => {
+    const unsubscribe =
+      subscribeToLocalities(
+        (data: any[]) => {
+          setLocalities(data);
+        }
+      );
+
+    return () => unsubscribe();
+  }, []);
+
   const saveProfile = async () => {
     if (
       !vendorName ||
@@ -51,29 +69,22 @@ export default function VendorProfileScreen({
       return;
     }
 
-    console.log(
-      "Checking Vendor:",
-      vendorName,
-      locality
-    );
-
-    try {const exists =
-      await vendorExists(
-        vendorName,
-        locality
-      );
+    try {
+      const exists =
+        await vendorExists(
+          vendorName,
+          locality
+        );
 
       if (exists) {
-        console.log(
-          "DUPLICATE VENDOR FOUND"
-        );
-      
-        alert(
+        Alert.alert(
+          "Duplicate Vendor",
           `${vendorName} already exists in ${locality}`
         );
-      
+
         return;
       }
+
       const mobileAlreadyExists =
         await mobileExists(
           mobile
@@ -82,29 +93,37 @@ export default function VendorProfileScreen({
       if (
         mobileAlreadyExists
       ) {
-        alert(
+        Alert.alert(
+          "Duplicate Mobile",
           `Mobile number ${mobile} is already registered`
         );
 
         return;
       }
+
       await createVendor({
         vendorName,
         ownerName,
         mobile,
         locality,
         address,
-        active: true,
+      
+        active: false,
+      
+        approvalStatus:
+          "Pending",
+      
         createdAt:
           new Date().toISOString(),
       });
 
-      console.log(
-        "Vendor saved successfully"
+      Alert.alert(
+        "Registration Submitted",
+        "Your vendor profile has been submitted for admin approval."
       );
       
       navigation.navigate(
-        "VendorDashboard"
+        "VendorApprovalPending"
       );
     } catch (error) {
       console.log(error);
@@ -117,125 +136,154 @@ export default function VendorProfileScreen({
   };
 
   return (
-    <View
+    <ScrollView
       style={{
         flex: 1,
-        padding: 20,
-        backgroundColor: "#f5f5f5",
+        backgroundColor:
+          "#f5f5f5",
       }}
     >
-      <Text
-        style={{
-          fontSize: 30,
-          fontWeight: "bold",
-          textAlign: "center",
-          marginBottom: 25,
-        }}
-      >
-        Vendor Profile
-      </Text>
-
-      <TextInput
-        placeholder="Vendor Name"
-        value={vendorName}
-        onChangeText={setVendorName}
-        style={inputStyle}
-      />
-
-      <TextInput
-        placeholder="Owner Name"
-        value={ownerName}
-        onChangeText={setOwnerName}
-        style={inputStyle}
-      />
-
-      <TextInput
-        placeholder="Mobile Number"
-        value={mobile}
-        onChangeText={setMobile}
-        keyboardType="phone-pad"
-        style={inputStyle}
-      />
-
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "bold",
-          marginBottom: 10,
-        }}
-      >
-        Select Locality
-      </Text>
-
       <View
         style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          marginBottom: 20,
-        }}
-      >
-        {LOCALITIES.map((item) => (
-          <TouchableOpacity
-            key={item}
-            onPress={() =>
-              setLocality(item)
-            }
-            style={{
-              backgroundColor:
-                locality === item
-                  ? "green"
-                  : "#dddddd",
-
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-              borderRadius: 20,
-              marginRight: 10,
-              marginBottom: 10,
-            }}
-          >
-            <Text
-              style={{
-                color:
-                  locality === item
-                    ? "white"
-                    : "black",
-                fontWeight: "bold",
-              }}
-            >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <TextInput
-        placeholder="Address"
-        value={address}
-        onChangeText={setAddress}
-        style={inputStyle}
-      />
-
-      <TouchableOpacity
-        onPress={saveProfile}
-        style={{
-          backgroundColor: "green",
-          padding: 18,
-          borderRadius: 10,
-          marginTop: 10,
+          padding: 20,
         }}
       >
         <Text
           style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 18,
+            fontSize: 30,
             fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: 25,
           }}
         >
-          Save Profile
+          Vendor Profile
         </Text>
-      </TouchableOpacity>
-    </View>
+
+        <TextInput
+          placeholder="Vendor Name"
+          value={vendorName}
+          onChangeText={
+            setVendorName
+          }
+          style={inputStyle}
+        />
+
+        <TextInput
+          placeholder="Owner Name"
+          value={ownerName}
+          onChangeText={
+            setOwnerName
+          }
+          style={inputStyle}
+        />
+
+        <TextInput
+          placeholder="Mobile Number"
+          value={mobile}
+          onChangeText={
+            setMobile
+          }
+          keyboardType="phone-pad"
+          style={inputStyle}
+        />
+
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            marginBottom: 10,
+          }}
+        >
+          Select Locality
+        </Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            marginBottom: 20,
+          }}
+        >
+          {localities.map(
+            (item: any) => (
+              <TouchableOpacity
+                key={
+                  item.firestoreId
+                }
+                onPress={() =>
+                  setLocality(
+                    item.name
+                  )
+                }
+                style={{
+                  backgroundColor:
+                    locality ===
+                    item.name
+                      ? "green"
+                      : "#dddddd",
+
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                  borderRadius: 20,
+                  marginRight: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    color:
+                      locality ===
+                      item.name
+                        ? "white"
+                        : "black",
+
+                    fontWeight:
+                      "bold",
+                  }}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            )
+          )}
+        </View>
+
+        <TextInput
+          placeholder="Address"
+          value={address}
+          onChangeText={
+            setAddress
+          }
+          style={inputStyle}
+        />
+
+        <TouchableOpacity
+          onPress={
+            saveProfile
+          }
+          style={{
+            backgroundColor:
+              "green",
+            padding: 18,
+            borderRadius: 10,
+            marginTop: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign:
+                "center",
+              fontSize: 18,
+              fontWeight:
+                "bold",
+            }}
+          >
+            Save Profile
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
