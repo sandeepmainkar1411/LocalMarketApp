@@ -1,4 +1,7 @@
 import { createOrder } from "../services/orderService";
+import {
+  createNotification,
+} from "../services/notificationService";
 
 import {
   View,
@@ -520,6 +523,37 @@ export default function CartScreen({
                 await createOrder(
                   newOrder
                 );
+                
+                await createNotification({
+                  vendorName:
+                    cartItems[0]?.vendorName,
+                
+                  customer:
+                    customerName,
+                
+                  mobile:
+                    customerMobile,
+                
+                  locality:
+                    locality,
+                
+                  address:
+                    buildingName,
+                
+                  items:
+                    cartItems,
+                
+                  total:
+                    totalAmount,
+                
+                  title:
+                    "New Order Received",
+                
+                  read: false,
+                
+                  createdAt:
+                    new Date(),
+                });
 
                 navigation.navigate(
                   "OrderSuccess"
