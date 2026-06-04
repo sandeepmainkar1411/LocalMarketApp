@@ -1,7 +1,13 @@
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
+import {
+  fetchCustomers,
+} from "../services/customerService";
 
-export default function OtpVerificationScreen({ navigation }: any) {
+export default function OtpVerificationScreen({
+  navigation,
+  route,
+}: any) {
   const [otp, setOtp] = useState("");
 
   return (
@@ -38,7 +44,40 @@ export default function OtpVerificationScreen({ navigation }: any) {
       />
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("CustomerDashboard")}
+        onPress={async () => {
+          try {
+            const mobile =
+              route.params?.mobile;
+
+            const customers =
+              await fetchCustomers();
+
+            const customer =
+              customers.find(
+                (item: any) =>
+                  item.mobile ===
+                  mobile
+              );
+
+            if (customer) {
+              navigation.navigate(
+                "SelectLocality",
+                {
+                  customer,
+                }
+              );
+            } else {
+              navigation.navigate(
+                "CustomerProfile",
+                {
+                  mobile,
+                }
+              );
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }}
         style={{
           backgroundColor: "green",
           padding: 15,

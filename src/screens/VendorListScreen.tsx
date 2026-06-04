@@ -25,6 +25,9 @@ export default function VendorListScreen({
   const selectedLocality =
     route?.params?.locality;
 
+    const customer =
+      route?.params?.customer;
+
   const [vendors, setVendors] =
     useState<any[]>([]);
 
@@ -156,9 +159,11 @@ export default function VendorListScreen({
                 "VendorDetails",
                 {
                   vendor: item,
+                  customer,
                 }
               )
             }
+
             style={{
               backgroundColor:
                 "#fff",

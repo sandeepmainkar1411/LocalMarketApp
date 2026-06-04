@@ -31,6 +31,8 @@ import VendorApprovalPendingScreen from "../screens/VendorApprovalPendingScreen"
 import VendorNotificationsScreen from "../screens/VendorNotificationsScreen";
 import CustomerComplaintScreen from "../screens/CustomerComplaintScreen";
 import AdminComplaintsScreen from "../screens/AdminComplaintsScreen";
+import VendorSuspendedScreen from "../screens/VendorSuspendedScreen";
+import CustomerProfileScreen from "../screens/CustomerProfileScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -95,6 +97,11 @@ export default function AppNavigator() {
       />
 
       <Stack.Screen
+        name="VendorSuspended"
+        component={VendorSuspendedScreen}
+      />
+
+      <Stack.Screen
         name="VendorTerms"
         component={
           VendorTermsScreen
@@ -150,6 +157,11 @@ export default function AppNavigator() {
         component={
           VendorListScreen
         }
+      />
+
+      <Stack.Screen
+        name="CustomerProfile"
+        component={CustomerProfileScreen}
       />
 
       <Stack.Screen
@@ -223,6 +235,7 @@ export default function AppNavigator() {
         component={AdminComplaintsScreen}
       />
 
+    
 
     </Stack.Navigator>
   );

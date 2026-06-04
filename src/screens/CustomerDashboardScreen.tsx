@@ -6,7 +6,11 @@ import {
 
 export default function CustomerDashboardScreen({
   navigation,
+  route,
 }: any) {
+  const customer =
+    route?.params?.customer;
+
   return (
     <View
       style={{
@@ -28,10 +32,14 @@ export default function CustomerDashboardScreen({
       </Text>
 
       {/* Browse Vendors */}
+
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(
-            "SelectLocality"
+            "SelectLocality",
+            {
+              customer,
+            }
           )
         }
         style={{
@@ -54,10 +62,14 @@ export default function CustomerDashboardScreen({
       </TouchableOpacity>
 
       {/* My Orders */}
+
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(
-            "CustomerOrders"
+            "CustomerOrders",
+            {
+              customer,
+            }
           )
         }
         style={{
@@ -80,6 +92,7 @@ export default function CustomerDashboardScreen({
       </TouchableOpacity>
 
       {/* Nearby Deals */}
+
       <TouchableOpacity
         style={{
           backgroundColor: "orange",

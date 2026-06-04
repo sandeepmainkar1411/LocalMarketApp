@@ -39,17 +39,10 @@ export default function VendorMobileLookupScreen({
               mobile.trim()
           );
 
-          console.log(
-            "APPROVAL STATUS:",
-            vendor?.approvalStatus
-          );
-          
-          console.log(
-            "ACTIVE:",
-            vendor?.active
-          );
-          
-          
+        console.log(
+          "FOUND VENDOR:",
+          vendor
+        );
 
         if (!vendor) {
           Alert.alert(
@@ -64,6 +57,18 @@ export default function VendorMobileLookupScreen({
           return;
         }
 
+        console.log(
+          "APPROVAL STATUS:",
+          vendor.approvalStatus
+        );
+
+        console.log(
+          "ACTIVE:",
+          vendor.active
+        );
+
+        /* PENDING */
+
         if (
           vendor.approvalStatus ===
           "Pending"
@@ -71,9 +76,11 @@ export default function VendorMobileLookupScreen({
           navigation.navigate(
             "VendorApprovalPending"
           );
-        
+
           return;
         }
+
+        /* REJECTED */
 
         if (
           vendor.approvalStatus ===
@@ -86,6 +93,23 @@ export default function VendorMobileLookupScreen({
 
           return;
         }
+
+        /* SUSPENDED */
+
+        if (
+          vendor.approvalStatus ===
+            "Suspended" ||
+          vendor.active ===
+            false
+        ) {
+          navigation.navigate(
+            "VendorSuspended"
+          );
+
+          return;
+        }
+
+        /* APPROVED */
 
         Alert.alert(
           "Welcome Back",

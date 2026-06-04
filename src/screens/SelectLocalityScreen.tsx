@@ -16,9 +16,13 @@ import {
 
 export default function SelectLocalityScreen({
   navigation,
+  route,
 }: any) {
   const [localities, setLocalities] =
     useState<any[]>([]);
+
+  const customer =
+    route.params?.customer;
 
   useEffect(() => {
     const unsubscribe =
@@ -67,21 +71,19 @@ export default function SelectLocalityScreen({
                   {
                     locality:
                       locality.name,
+
+                    customer:
+                      customer,
                   }
                 )
               }
               style={{
                 backgroundColor:
                   "#ffffff",
-
                 padding: 20,
-
                 borderRadius: 12,
-
                 marginBottom: 15,
-
                 borderWidth: 1,
-
                 borderColor:
                   "#ddd",
               }}

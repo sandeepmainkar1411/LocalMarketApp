@@ -34,6 +34,9 @@ export default function CartScreen({
   const [mobile, setMobile] =
     useState("");
 
+    const customer =
+    route?.params?.customer;
+
   const increaseQuantity = (
     id: string
   ) => {
@@ -494,27 +497,32 @@ export default function CartScreen({
                 }
 
                 const newOrder = {
-                  customer: "Rahul Sharma",
-                
+                  customerName:
+                    customer?.customerName ||
+                    "Unknown Customer",
+
+                  customerMobile:
+                    customer?.mobile || "",
+
                   vendorName:
                     cartItems[0]?.vendorName || "",
-                
+
                   locality:
                     cartItems[0]?.locality || "",
-                
+
                   items: cartItems,
-                
+
                   total: totalAmount,
-                
+
                   address: {
                     building,
                     flat,
                     landmark,
                     mobile,
                   },
-                
+
                   status: "Placed",
-                
+
                   createdAt:
                     new Date(),
                 };
@@ -528,7 +536,8 @@ export default function CartScreen({
                     cartItems[0]?.vendorName || "",
                 
                   customer:
-                    "Rahul Sharma",
+                    customer?.customerName ||
+                    "Unknown Customer",
                 
                   mobile:
                     mobile,
@@ -549,7 +558,7 @@ export default function CartScreen({
                     "New Order Received",
                 
                   message:
-                    `Rahul Sharma placed an order worth ₹${totalAmount}`,
+                    `${customer?.customerName || "Customer"} placed an order worth ₹${totalAmount}`,
                 
                   read: false,
                 

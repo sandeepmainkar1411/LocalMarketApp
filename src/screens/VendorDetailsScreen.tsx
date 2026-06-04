@@ -58,18 +58,23 @@ export default function VendorDetailsScreen({
   navigation,
 }: any) {
   const vendor =
-  route?.params?.vendor || {
-    name: "Fresh Vegetable Market",
-    locality: "JB Nagar",
-  };
+    route?.params?.vendor || {
+      name: "Fresh Vegetable Market",
+      locality: "JB Nagar",
+    };
+
+  const customer =
+    route?.params?.customer;
 
   const [products, setProducts] =
     useState<any[]>([]);
 
-    const [cartItems, setCartItems] =
+  const [cartItems, setCartItems] =
     useState<any[]>(
       route?.params?.cartItems || []
     );
+
+    
 
   const [
     selectedQuantities,
@@ -395,7 +400,8 @@ export default function VendorDetailsScreen({
             navigation.navigate(
               "Cart",
               {
-                cartItems: cartItems,
+                cartItems,
+                customer,
               }
             )
           }
