@@ -33,6 +33,7 @@ import CustomerComplaintScreen from "../screens/CustomerComplaintScreen";
 import AdminComplaintsScreen from "../screens/AdminComplaintsScreen";
 import VendorSuspendedScreen from "../screens/VendorSuspendedScreen";
 import CustomerProfileScreen from "../screens/CustomerProfileScreen";
+import CustomerProfileViewScreen from "../screens/CustomerProfileViewScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -162,6 +163,13 @@ export default function AppNavigator() {
       <Stack.Screen
         name="CustomerProfile"
         component={CustomerProfileScreen}
+      />
+
+      <Stack.Screen
+        name="CustomerProfileView"
+        component={
+          CustomerProfileViewScreen
+        }
       />
 
       <Stack.Screen

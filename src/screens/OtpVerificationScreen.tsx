@@ -43,57 +43,59 @@ export default function OtpVerificationScreen({
         }}
       />
 
-      <TouchableOpacity
-        onPress={async () => {
-          try {
-            const mobile =
-              route.params?.mobile;
+<TouchableOpacity
+  onPress={async () => {
+    try {
+      const mobile =
+        route?.params?.mobile;
 
-            const customers =
-              await fetchCustomers();
+      const customers =
+        await fetchCustomers();
 
-            const customer =
-              customers.find(
-                (item: any) =>
-                  item.mobile ===
-                  mobile
-              );
+      const customer =
+        customers.find(
+          (item: any) =>
+            item.mobile === mobile
+        );
 
-            if (customer) {
-              navigation.navigate(
-                "SelectLocality",
-                {
-                  customer,
-                }
-              );
-            } else {
-              navigation.navigate(
-                "CustomerProfile",
-                {
-                  mobile,
-                }
-              );
-            }
-          } catch (error) {
-            console.log(error);
+      if (customer) {
+        navigation.navigate(
+          "CustomerDashboard",
+          {
+            customer,
           }
-        }}
-        style={{
-          backgroundColor: "green",
-          padding: 15,
-          borderRadius: 10,
-        }}
-      >
-        <Text
-          style={{
-            color: "white",
-            textAlign: "center",
-            fontWeight: "bold",
-          }}
-        >
-          Verify OTP
-        </Text>
-      </TouchableOpacity>
+        );
+      } else {
+        navigation.navigate(
+          "CustomerProfile",
+          {
+            mobile,
+          }
+        );
+      }
+    } catch (error) {
+      console.log(
+        "OTP Error:",
+        error
+      );
+    }
+  }}
+  style={{
+    backgroundColor: "green",
+    padding: 15,
+    borderRadius: 10,
+  }}
+>
+  <Text
+    style={{
+      color: "white",
+      textAlign: "center",
+      fontWeight: "bold",
+    }}
+  >
+    Verify OTP
+  </Text>
+</TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => navigation.goBack()}

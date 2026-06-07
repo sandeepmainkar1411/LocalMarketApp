@@ -534,74 +534,72 @@ export default function CartScreen({
                 await createNotification({
                   vendorName:
                     cartItems[0]?.vendorName || "",
-                
+
                   customer:
                     customer?.customerName ||
                     "Unknown Customer",
-                
+
                   mobile:
                     mobile,
-                
+
                   locality:
                     cartItems[0]?.locality || "",
-                
+
                   address:
                     building,
-                
+
                   items:
                     cartItems,
-                
+
                   total:
                     totalAmount,
-                
+
                   title:
                     "New Order Received",
-                
+
                   message:
                     `${customer?.customerName || "Customer"} placed an order worth ₹${totalAmount}`,
-                
+
                   read: false,
-                
+
                   createdAt:
                     new Date().toISOString(),
                 });
 
                 navigation.navigate(
-                  "OrderSuccess"
+                  "OrderSuccess",
+                  {
+                    customer,
+                  }
                 );
-              }}
-              style={{
-                backgroundColor:
-                  totalAmount >= 200
-                    ? "green"
-                    : "gray",
-
-                padding: 20,
-
-                borderRadius: 12,
-
-                marginBottom: 40,
-              }}
-            >
-              <Text
-                style={{
-                  color: "white",
-
-                  textAlign:
-                    "center",
-
-                  fontSize: 20,
-
-                  fontWeight:
-                    "bold",
                 }}
-              >
-                Place Order
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
-    </ScrollView>
-  );
-}
+                style={{
+                  backgroundColor:
+                    totalAmount >= 200
+                      ? "green"
+                      : "gray",
+
+                  padding: 20,
+
+                  borderRadius: 12,
+
+                  marginBottom: 40,
+                }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontSize: 20,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Place Order
+                  </Text>
+                  </TouchableOpacity>
+                  </>
+                  )}
+                  </View>
+                  </ScrollView>
+                  );
+                  }

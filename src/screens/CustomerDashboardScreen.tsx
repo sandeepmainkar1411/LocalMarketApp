@@ -91,6 +91,35 @@ export default function CustomerDashboardScreen({
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(
+            "CustomerProfileView",
+            {
+              customer:
+                route?.params?.customer,
+            }
+          )
+        }
+        style={{
+          backgroundColor: "#6a1b9a",
+          padding: 18,
+          borderRadius: 12,
+          marginBottom: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 20,
+          }}
+        >
+          My Profile
+        </Text>
+      </TouchableOpacity>
+
       {/* Nearby Deals */}
 
       <TouchableOpacity
@@ -109,6 +138,37 @@ export default function CustomerDashboardScreen({
           }}
         >
           View Nearby Deals
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name:
+                  "RoleSelection",
+              },
+            ],
+          })
+        }
+        style={{
+          backgroundColor: "#d32f2f",
+          padding: 18,
+          borderRadius: 12,
+          marginTop: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 20,
+          }}
+        >
+          Logout
         </Text>
       </TouchableOpacity>
     </View>
