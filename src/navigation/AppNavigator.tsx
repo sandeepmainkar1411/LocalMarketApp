@@ -34,6 +34,9 @@ import AdminComplaintsScreen from "../screens/AdminComplaintsScreen";
 import VendorSuspendedScreen from "../screens/VendorSuspendedScreen";
 import CustomerProfileScreen from "../screens/CustomerProfileScreen";
 import CustomerProfileViewScreen from "../screens/CustomerProfileViewScreen";
+import CustomerProfileEditScreen from "../screens/CustomerProfileEditScreen";
+import CustomerRatingScreen from "../screens/CustomerRatingScreen";
+import VendorReviewsScreen from "../screens/VendorReviewsScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -173,6 +176,13 @@ export default function AppNavigator() {
       />
 
       <Stack.Screen
+        name="CustomerProfileEdit"
+        component={
+          CustomerProfileEditScreen
+        }
+      />
+
+      <Stack.Screen
         name="VendorDetails"
         component={
           VendorDetailsScreen
@@ -241,6 +251,20 @@ export default function AppNavigator() {
       <Stack.Screen
         name="AdminComplaints"
         component={AdminComplaintsScreen}
+      />
+
+      <Stack.Screen
+        name="CustomerRating"
+        component={
+          CustomerRatingScreen
+        }
+      />
+
+      <Stack.Screen
+        name="VendorReviews"
+        component={
+          VendorReviewsScreen
+        }
       />
 
     

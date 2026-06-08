@@ -35,22 +35,9 @@ export default function CustomerOrdersScreen({
                 customer?.mobile
             );
 
-          console.log(
-            "Current Customer Mobile:",
-            customer?.mobile
+          setOrders(
+            filteredOrders
           );
-
-          console.log(
-            "Total Orders:",
-            ordersData.length
-          );
-
-          console.log(
-            "Filtered Orders:",
-            filteredOrders.length
-          );
-
-          setOrders(filteredOrders);
         }
       );
 
@@ -61,7 +48,8 @@ export default function CustomerOrdersScreen({
     <ScrollView
       style={{
         flex: 1,
-        backgroundColor: "#f5f5f5",
+        backgroundColor:
+          "#f5f5f5",
       }}
     >
       <View
@@ -109,18 +97,15 @@ export default function CustomerOrdersScreen({
             <Text
               style={{
                 fontSize: 24,
-                fontWeight:
-                  "bold",
+                fontWeight: "bold",
                 marginBottom: 15,
               }}
             >
               Order #
-              {order.id?.slice(
-                0,
-                6
-              )}
+              {order.id?.slice(0, 6)}
             </Text>
 
+            {/* Products */}
             <View
               style={{
                 marginBottom: 15,
@@ -145,6 +130,7 @@ export default function CustomerOrdersScreen({
               )}
             </View>
 
+            {/* Address */}
             <Text
               style={{
                 fontSize: 16,
@@ -152,16 +138,8 @@ export default function CustomerOrdersScreen({
                 marginBottom: 5,
               }}
             >
-              📍{" "}
-              {
-                order.address
-                  ?.flat
-              }
-              ,{" "}
-              {
-                order.address
-                  ?.building
-              }
+              📍 {order.address?.flat},{" "}
+              {order.address?.building}
             </Text>
 
             <Text
@@ -171,25 +149,93 @@ export default function CustomerOrdersScreen({
                 marginBottom: 15,
               }}
             >
-              📞{" "}
-              {
-                order.address
-                  ?.mobile
-              }
+              📞 {order.address?.mobile}
             </Text>
 
+            {/* Total */}
             <Text
               style={{
                 fontSize: 30,
                 color: "green",
-                fontWeight:
-                  "bold",
+                fontWeight: "bold",
                 marginBottom: 15,
               }}
             >
               ₹{order.total}
             </Text>
 
+            {/* Tracking */}
+            <View
+              style={{
+                backgroundColor:
+                  "#f8f9fa",
+                padding: 15,
+                borderRadius: 10,
+                marginBottom: 15,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  marginBottom: 10,
+                }}
+              >
+                Order Tracking 🚚
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 18,
+                  marginBottom: 5,
+                }}
+              >
+                🟢 Placed
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 18,
+                  marginBottom: 5,
+                }}
+              >
+                {order.status ===
+                  "Accepted" ||
+                order.status ===
+                  "Out For Delivery" ||
+                order.status ===
+                  "Delivered"
+                  ? "🟢 Accepted"
+                  : "⚪ Accepted"}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 18,
+                  marginBottom: 5,
+                }}
+              >
+                {order.status ===
+                  "Out For Delivery" ||
+                order.status ===
+                  "Delivered"
+                  ? "🟢 Out For Delivery"
+                  : "⚪ Out For Delivery"}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 18,
+                }}
+              >
+                {order.status ===
+                "Delivered"
+                  ? "🟢 Delivered"
+                  : "⚪ Delivered"}
+              </Text>
+            </View>
+
+            {/* Status */}
             <Text
               style={{
                 fontSize: 22,
@@ -201,45 +247,77 @@ export default function CustomerOrdersScreen({
                       "Rejected"
                     ? "red"
                     : "orange",
-                fontWeight:
-                  "bold",
+                fontWeight: "bold",
               }}
             >
               Status: {order.status}
             </Text>
 
+            {/* Rating + Complaint */}
             {order.status ===
               "Delivered" && (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate(
-                    "CustomerComplaint",
-                    {
-                      order,
-                    }
-                  )
-                }
-                style={{
-                  backgroundColor:
-                    "#f44336",
-                  padding: 15,
-                  borderRadius: 10,
-                  marginTop: 15,
-                }}
-              >
-                <Text
+              <View>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate(
+                      "CustomerRating",
+                      {
+                        order,
+                      }
+                    )
+                  }
                   style={{
-                    color:
-                      "white",
-                    textAlign:
-                      "center",
-                    fontWeight:
-                      "bold",
+                    backgroundColor:
+                      "#4CAF50",
+                    padding: 15,
+                    borderRadius: 10,
+                    marginTop: 15,
+                    marginBottom: 10,
                   }}
                 >
-                  Report Complaint
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: "white",
+                      textAlign:
+                        "center",
+                      fontWeight:
+                        "bold",
+                    }}
+                  >
+                    ⭐ Rate Vendor
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate(
+                      "CustomerComplaint",
+                      {
+                        order,
+                      }
+                    )
+                  }
+                  style={{
+                    backgroundColor:
+                      "#f44336",
+                    padding: 15,
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color:
+                        "white",
+                      textAlign:
+                        "center",
+                      fontWeight:
+                        "bold",
+                    }}
+                  >
+                    Report Complaint
+                  </Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         ))}

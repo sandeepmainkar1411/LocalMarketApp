@@ -18,6 +18,10 @@ import {
   fetchVendors,
 } from "../services/vendorService";
 
+import {
+  getVendorRating,
+} from "../services/ratingService";
+
 export default function VendorListScreen({
   navigation,
   route,
@@ -25,13 +29,15 @@ export default function VendorListScreen({
   const selectedLocality =
     route?.params?.locality;
 
-    const customer =
-      route?.params?.customer;
+  const customer =
+    route?.params?.customer;
 
   const [vendors, setVendors] =
     useState<any[]>([]);
 
   useEffect(() => {
+    let unsubscribe: any;
+
     const loadData = async () => {
       const allVendors =
         await fetchVendors();
@@ -40,17 +46,18 @@ export default function VendorListScreen({
         allVendors
           .filter(
             (vendor) =>
-              vendor.active ===
-              true
+              vendor.active === true
           )
           .map(
             (vendor) =>
               vendor.vendorName
           );
 
-      const unsubscribe =
+      unsubscribe =
         subscribeToProducts(
-          (products: any[]) => {
+          async (
+            products: any[]
+          ) => {
             const vendorMap =
               new Map();
 
@@ -78,6 +85,10 @@ export default function VendorListScreen({
 
                         locality:
                           product.locality,
+
+                        rating: 0,
+
+                        totalReviews: 0,
                       }
                     );
                   }
@@ -85,18 +96,47 @@ export default function VendorListScreen({
               }
             );
 
-            setVendors(
+            const vendorArray =
               Array.from(
                 vendorMap.values()
-              )
+              );
+
+            const updatedVendors =
+              await Promise.all(
+                vendorArray.map(
+                  async (
+                    vendor: any
+                  ) => {
+                    const ratingData =
+                      await getVendorRating(
+                        vendor.name
+                      );
+
+                    return {
+                      ...vendor,
+                      rating:
+                        ratingData.average,
+                      totalReviews:
+                        ratingData.totalReviews,
+                    };
+                  }
+                )
+              );
+
+            setVendors(
+              updatedVendors
             );
           }
         );
-
-      return unsubscribe;
     };
 
     loadData();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [selectedLocality]);
 
   return (
@@ -163,7 +203,6 @@ export default function VendorListScreen({
                 }
               )
             }
-
             style={{
               backgroundColor:
                 "#fff",
@@ -183,6 +222,26 @@ export default function VendorListScreen({
               }}
             >
               {item.name}
+            </Text>
+
+            <Text
+              style={{
+                color: "#f39c12",
+                marginTop: 5,
+                fontWeight:
+                  "bold",
+                fontSize: 16,
+              }}
+            >
+              ⭐{" "}
+              {item.totalReviews >
+              0
+                ? item.rating.toFixed(
+                    1
+                  )
+                : "New Vendor"}
+              {"  "}
+              ({item.totalReviews})
             </Text>
 
             <Text
