@@ -35,6 +35,10 @@ const vendorName =
 
 const locality =
   vendor?.locality || "";
+
+  const [selectedCategory, setSelectedCategory] =
+  useState("Vegetable");
+
   const [selectedVegetable, setSelectedVegetable] =
     useState<any>(null);
 
@@ -54,9 +58,12 @@ const locality =
 
   const newProduct = {
     id: Date.now().toString(),
-    
+       
       vegetable:
         selectedVegetable.marathi,
+
+      category:
+        selectedCategory,
     
       unit: selectedUnit,
     
@@ -108,6 +115,78 @@ const locality =
           Add Vegetables 🥬
         </Text>
 
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 25,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() =>
+              setSelectedCategory(
+                "Vegetable"
+              )
+            }
+            style={{
+              backgroundColor:
+                selectedCategory ===
+                "Vegetable"
+                  ? "green"
+                  : "#fff",
+              width: "48%",
+              padding: 15,
+              borderRadius: 12,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                color:
+                  selectedCategory ===
+                  "Vegetable"
+                    ? "white"
+                    : "black",
+                fontWeight: "bold",
+              }}
+            >
+              🥬 Vegetables
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() =>
+              setSelectedCategory(
+                "Fruit"
+              )
+            }
+            style={{
+              backgroundColor:
+                selectedCategory ===
+                "Fruit"
+                  ? "orange"
+                  : "#fff",
+              width: "48%",
+              padding: 15,
+              borderRadius: 12,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                color:
+                  selectedCategory ===
+                  "Fruit"
+                    ? "white"
+                    : "black",
+                fontWeight: "bold",
+              }}
+            >
+              🍎 Fruits
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <Text
           style={{
             fontSize: 22,
@@ -126,7 +205,13 @@ const locality =
               "space-between",
           }}
         >
-          {masterProducts.map((item) => (
+          {masterProducts
+            .filter(
+              (item) =>
+                item.category ===
+                selectedCategory
+            )
+            .map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() =>

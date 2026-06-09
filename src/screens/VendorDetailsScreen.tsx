@@ -69,6 +69,10 @@ export default function VendorDetailsScreen({
   const [products, setProducts] =
     useState<any[]>([]);
 
+  const [selectedCategory,
+    setSelectedCategory] =
+    useState("Vegetable");
+
   const [cartItems, setCartItems] =
     useState<any[]>(
       route?.params?.cartItems || []
@@ -222,7 +226,116 @@ export default function VendorDetailsScreen({
             {vendor.locality}
           </Text>
 
-          {products.map((product) => (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 25,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedCategory(
+                  "Vegetable"
+                )
+              }
+              style={{
+                backgroundColor:
+                  selectedCategory ===
+                  "Vegetable"
+                    ? "green"
+                    : "#ffffff",
+
+                width: "48%",
+
+                padding: 15,
+
+                borderRadius: 12,
+
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color:
+                    selectedCategory ===
+                    "Vegetable"
+                      ? "white"
+                      : "black",
+
+                  fontWeight: "bold",
+                }}
+              >
+                🥬 Vegetables
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedCategory(
+                  "Fruit"
+                )
+              }
+              style={{
+                backgroundColor:
+                  selectedCategory ===
+                  "Fruit"
+                    ? "orange"
+                    : "#ffffff",
+
+                width: "48%",
+
+                padding: 15,
+
+                borderRadius: 12,
+
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color:
+                    selectedCategory ===
+                    "Fruit"
+                      ? "white"
+                      : "black",
+
+                  fontWeight: "bold",
+                }}
+              >
+                🍎 Fruits
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+
+          {products.filter(
+              (product) =>
+                (product.category ||
+                  "Vegetable") ===
+                selectedCategory
+            ).length === 0 && (
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "gray",
+                  fontSize: 18,
+                  marginTop: 30,
+                  marginBottom: 30,
+                }}
+              >
+                No {selectedCategory}s available
+              </Text>
+            )}
+
+          {products
+            .filter(
+              (product) =>
+                (product.category ||
+                  "Vegetable") ===
+                selectedCategory
+            )
+            .map((product) => (
             <View
               key={product.id}
               style={{
@@ -243,15 +356,15 @@ export default function VendorDetailsScreen({
               <Text
                 style={{
                   fontSize: 28,
-
                   fontWeight: "bold",
-
                   marginBottom: 10,
                 }}
               >
-                {
-                  product.vegetable
-                }
+                {(product.category ===
+                "Fruit"
+                  ? "🍎 "
+                  : "🥬 ") +
+                  product.vegetable}
               </Text>
 
               <Text
