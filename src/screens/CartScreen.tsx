@@ -11,7 +11,14 @@ import {
   TextInput,
 } from "react-native";
 
-import { useState } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
+
+import {
+  getPlatformFee,
+} from "../services/settingsService";
 
 export default function CartScreen({
   navigation,
@@ -34,8 +41,24 @@ export default function CartScreen({
   const [mobile, setMobile] =
     useState("");
 
-    const customer =
+  const customer =
     route?.params?.customer;
+
+  const [platformFee,
+      setPlatformFee] =
+      useState(0);
+
+  useEffect(() => {
+  loadPlatformFee();
+}, []);
+
+const loadPlatformFee =
+  async () => {
+    const fee =
+      await getPlatformFee();
+
+    setPlatformFee(fee);
+  };
 
   const increaseQuantity = (
     id: string
@@ -107,6 +130,12 @@ export default function CartScreen({
         item.quantity,
     0
   );
+
+
+
+const grandTotal =
+  totalAmount +
+  platformFee;
 
   return (
     <ScrollView
@@ -437,28 +466,56 @@ export default function CartScreen({
               <Text
                 style={{
                   fontSize: 24,
+                  fontWeight: "bold",
+                  marginBottom: 20,
+                }}
+              >
+                Order Summary
+              </Text>
 
-                  fontWeight:
-                    "bold",
-
+              <View
+                style={{
                   marginBottom: 10,
                 }}
               >
-                Total Amount
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 18,
+                  }}
+                >
+                  Products Total:
+                  ₹{totalAmount}
+                </Text>
 
-              <Text
-                style={{
-                  fontSize: 32,
+                <Text
+                  style={{
+                    fontSize: 18,
+                    marginTop: 10,
+                  }}
+                >
+                  Platform Fee:
+                  ₹{platformFee}
+                </Text>
 
-                  color: "green",
+                <View
+                  style={{
+                    borderBottomWidth: 1,
+                    borderColor: "#ddd",
+                    marginVertical: 15,
+                  }}
+                />
 
-                  fontWeight:
-                    "bold",
-                }}
-              >
-                ₹{totalAmount}
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 30,
+                    color: "green",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Grand Total:
+                  ₹{grandTotal}
+                </Text>
+              </View>
 
               {totalAmount < 200 && (
                 <Text
@@ -512,7 +569,14 @@ export default function CartScreen({
 
                   items: cartItems,
 
-                  total: totalAmount,
+                  subtotal:
+                    totalAmount,
+
+                  platformFee:
+                    platformFee,
+
+                  total:
+                    grandTotal,
 
                   address: {
                     building,
@@ -552,13 +616,13 @@ export default function CartScreen({
                     cartItems,
 
                   total:
-                    totalAmount,
+                    grandTotal,
 
                   title:
                     "New Order Received",
 
                   message:
-                    `${customer?.customerName || "Customer"} placed an order worth ₹${totalAmount}`,
+                    `${customer?.customerName || "Customer"} placed an order worth ₹${grandTotal}`,
 
                   read: false,
 

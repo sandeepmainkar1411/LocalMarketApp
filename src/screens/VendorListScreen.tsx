@@ -35,6 +35,13 @@ export default function VendorListScreen({
   const [vendors, setVendors] =
     useState<any[]>([]);
 
+  const [selectedCategory,
+    setSelectedCategory] =
+    useState(
+      route?.params?.category ||
+        "Vegetable"
+      );
+
   useEffect(() => {
     let unsubscribe: any;
 
@@ -64,10 +71,11 @@ export default function VendorListScreen({
             products.forEach(
               (product) => {
                 if (
-                  product.available ===
-                    true &&
+                  product.available === true &&
                   product.locality ===
                     selectedLocality &&
+                  product.category ===
+                    selectedCategory &&
                   activeVendorNames.includes(
                     product.vendorName
                   )
@@ -137,7 +145,10 @@ export default function VendorListScreen({
         unsubscribe();
       }
     };
-  }, [selectedLocality]);
+  }, [
+    selectedLocality,
+    selectedCategory,
+  ]);
 
   return (
     <View
@@ -156,7 +167,9 @@ export default function VendorListScreen({
           textAlign: "center",
         }}
       >
-        Vegetable Vendors
+        {selectedCategory === "Vegetable"
+          ? "Vegetable Vendors"
+          : "Fruit Vendors"}
       </Text>
 
       <Text
@@ -169,6 +182,82 @@ export default function VendorListScreen({
       >
         📍 {selectedLocality}
       </Text>
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginBottom: 20,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() =>
+            setSelectedCategory(
+              "Vegetable"
+            )
+          }
+          style={{
+            backgroundColor:
+              selectedCategory ===
+              "Vegetable"
+                ? "green"
+                : "#fff",
+
+            width: "48%",
+            padding: 15,
+            borderRadius: 12,
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              color:
+                selectedCategory ===
+                "Vegetable"
+                  ? "white"
+                  : "black",
+
+              fontWeight: "bold",
+            }}
+          >
+            🥬 Vegetables
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            setSelectedCategory(
+              "Fruit"
+            )
+          }
+          style={{
+            backgroundColor:
+              selectedCategory ===
+              "Fruit"
+                ? "orange"
+                : "#fff",
+
+            width: "48%",
+            padding: 15,
+            borderRadius: 12,
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              color:
+                selectedCategory ===
+                "Fruit"
+                  ? "white"
+                  : "black",
+
+              fontWeight: "bold",
+            }}
+          >
+            🍎 Fruits
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       {vendors.length === 0 && (
         <Text
@@ -200,6 +289,8 @@ export default function VendorListScreen({
                 {
                   vendor: item,
                   customer,
+                  category:
+                    selectedCategory,
                 }
               )
             }

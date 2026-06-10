@@ -37,6 +37,9 @@ import CustomerProfileViewScreen from "../screens/CustomerProfileViewScreen";
 import CustomerProfileEditScreen from "../screens/CustomerProfileEditScreen";
 import CustomerRatingScreen from "../screens/CustomerRatingScreen";
 import VendorReviewsScreen from "../screens/VendorReviewsScreen";
+import AdminRevenueDashboardScreen from "../screens/AdminRevenueDashboardScreen";
+import AdminVendorCollectionScreen from "../screens/AdminVendorCollectionScreen";
+import VendorCollectionDetailsScreen from "../screens/VendorCollectionDetailsScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -147,6 +150,13 @@ export default function AppNavigator() {
         }
       />
 
+      <Stack.Screen
+        name="VendorCollectionDetails"
+        component={
+          VendorCollectionDetailsScreen
+        }
+      />
+
       {/* OTP */}
       <Stack.Screen
         name="OtpVerification"
@@ -230,6 +240,13 @@ export default function AppNavigator() {
       />
 
       <Stack.Screen
+        name="AdminVendorCollection"
+        component={
+          AdminVendorCollectionScreen
+        }
+      />
+
+      <Stack.Screen
         name="VendorApprovalPending"
         component={
           VendorApprovalPendingScreen
@@ -252,6 +269,13 @@ export default function AppNavigator() {
         name="AdminComplaints"
         component={AdminComplaintsScreen}
       />
+
+    <Stack.Screen
+      name="AdminRevenueDashboard"
+      component={
+        AdminRevenueDashboardScreen
+      }
+    />
 
       <Stack.Screen
         name="CustomerRating"

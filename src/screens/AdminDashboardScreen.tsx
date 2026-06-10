@@ -132,6 +132,57 @@ export default function AdminDashboardScreen({
           Statistics
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(
+            "AdminRevenueDashboard"
+          )
+        }
+        style={{
+          backgroundColor: "#4CAF50",
+          padding: 20,
+          borderRadius: 12,
+          marginBottom: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 20,
+          }}
+        >
+          📈 Revenue Dashboard
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(
+            "AdminVendorCollection"
+          )
+        }
+        style={{
+          backgroundColor:
+            "#795548",
+          padding: 20,
+          borderRadius: 10,
+          marginBottom: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 20,
+          }}
+        >
+          💰 Vendor Collections
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

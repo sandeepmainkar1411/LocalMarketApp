@@ -36,8 +36,10 @@ const vendorName =
 const locality =
   vendor?.locality || "";
 
+  
+
   const [selectedCategory, setSelectedCategory] =
-  useState("Vegetable");
+    useState("Vegetable");
 
   const [selectedVegetable, setSelectedVegetable] =
     useState<any>(null);
@@ -47,6 +49,13 @@ const locality =
 
   const [price, setPrice] =
     useState("");
+
+  const filteredProducts =
+    masterProducts.filter(
+      (item) =>
+        item.category ===
+        selectedCategory
+    );
 
   const handleSaveProduct = async () => {
     if (!selectedVegetable || !price) {
@@ -109,12 +118,13 @@ const locality =
             fontSize: 32,
             fontWeight: "bold",
             textAlign: "center",
-            marginBottom: 30,
+            marginBottom: 20,
           }}
         >
-          Add Vegetables 🥬
+          Add Products 🛒
         </Text>
 
+        
         <View
           style={{
             flexDirection: "row",
@@ -194,9 +204,12 @@ const locality =
             marginBottom: 15,
           }}
         >
-          Select Vegetable
+          {selectedCategory === "Vegetable"
+            ? "Select Vegetable"
+            : "Select Fruit"}
         </Text>
 
+        
         <View
           style={{
             flexDirection: "row",
@@ -205,13 +218,7 @@ const locality =
               "space-between",
           }}
         >
-          {masterProducts
-            .filter(
-              (item) =>
-                item.category ===
-                selectedCategory
-            )
-            .map((item) => (
+          {filteredProducts.map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() =>
