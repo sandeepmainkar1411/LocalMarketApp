@@ -40,8 +40,25 @@ export default function VendorOrdersScreen({
                 vendorName
             );
 
+          const sortedOrders =
+            filteredOrders.sort(
+              (a, b) => {
+                const orderA = Number(
+                  (a.orderNumber || "")
+                    .replace("LM-", "")
+                );
+
+                const orderB = Number(
+                  (b.orderNumber || "")
+                    .replace("LM-", "")
+                );
+
+                return orderB - orderA;
+              }
+            );
+
           setVendorOrders(
-            filteredOrders
+            sortedOrders
           );
         }
       );
@@ -157,19 +174,52 @@ export default function VendorOrdersScreen({
                   "#ddd",
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: 28,
-                  fontWeight:
-                    "bold",
                   marginBottom: 15,
                 }}
               >
-                👤{" "}
-                {
-                  order.customer
-                }
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "gray",
+                    marginBottom: 5,
+                  }}
+                >
+                  Order No:
+                  {" "}
+                  {order.orderNumber || order.id}
+                </Text>
+
+                <View
+                  style={{
+                    marginBottom: 15,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "gray",
+                      marginBottom: 5,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Order No:
+                    {" "}
+                    {order.orderNumber || order.id}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    👤{" "}
+                    {order.customerName}
+                  </Text>
+                </View>
+              </View>
 
               <Text
                 style={{

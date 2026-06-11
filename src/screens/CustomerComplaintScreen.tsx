@@ -26,53 +26,58 @@ import {
       setComplaint,
     ] = useState("");
   
-    const submitComplaint =
-      async () => {
-        if (
-          !complaint.trim()
-        ) {
-          Alert.alert(
-            "Validation",
-            "Please enter complaint details"
-          );
-          return;
-        }
-  
-        await createComplaint({
-          orderId:
-            order.id,
-        
-          vendorName:
-            order.vendorName,
-        
-          customerName:
-            order.customer,
-        
-          locality:
-            order.locality,
-        
-          total:
-            order.total,
-        
-          mobile:
-            order.address?.mobile,
-        
+    const submitComplaint = async () => {
+      try {
+    
+        console.log("SUBMIT CLICKED");
+    
+        const complaintData = {
+          orderId: order.id,
+          vendorName: order.vendorName,
+          customerName: order.customerName,
+          locality: order.locality,
+          total: order.total,
+          mobile: order.address?.mobile,
           complaint,
-        
-          status:
-            "Pending",
-        
-          createdAt:
-            new Date().toISOString(),
-        });
-  
+          status: "Pending",
+          createdAt: new Date().toISOString(),
+        };
+    
+        console.log(
+          "COMPLAINT DATA:",
+          complaintData
+        );
+    
+        const result =
+          await createComplaint(
+            complaintData
+          );
+    
+        console.log(
+          "CREATED ID:",
+          result
+        );
+    
         Alert.alert(
           "Success",
           "Complaint submitted successfully"
         );
-  
+    
         navigation.goBack();
-      };
+    
+      } catch (error) {
+    
+        console.log(
+          "COMPLAINT ERROR:",
+          error
+        );
+    
+        Alert.alert(
+          "Error",
+          JSON.stringify(error)
+        );
+      }
+    };
   
     return (
       <View

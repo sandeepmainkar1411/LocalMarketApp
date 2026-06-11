@@ -554,6 +554,10 @@ const grandTotal =
                 }
 
                 const newOrder = {
+
+                  orderNumber:
+                    "LM-" + Date.now(),
+
                   customerName:
                     customer?.customerName ||
                     "Unknown Customer",

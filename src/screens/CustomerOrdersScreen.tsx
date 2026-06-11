@@ -21,28 +21,49 @@ export default function CustomerOrdersScreen({
   const [orders, setOrders] =
     useState<any[]>([]);
 
-  useEffect(() => {
-    const customer =
-      route?.params?.customer;
-
-    const unsubscribe =
-      subscribeToOrders(
-        (ordersData: any[]) => {
-          const filteredOrders =
-            ordersData.filter(
-              (order: any) =>
-                order.customerMobile ===
-                customer?.mobile
+    useEffect(() => {
+      const customer =
+        route?.params?.customer;
+    
+      const unsubscribe =
+        subscribeToOrders(
+          (ordersData: any[]) => {
+            const filteredOrders =
+              ordersData.filter(
+                (order: any) =>
+                  order.customerMobile ===
+                  customer?.mobile
+              );
+    
+            const sortedOrders =
+              filteredOrders.sort(
+                (a, b) => {
+                  const dateA =
+                    a.createdAt?.toDate
+                      ? a.createdAt.toDate()
+                      : new Date(a.createdAt);
+    
+                  const dateB =
+                    b.createdAt?.toDate
+                      ? b.createdAt.toDate()
+                      : new Date(b.createdAt);
+    
+                  return (
+                    dateB.getTime() -
+                    dateA.getTime()
+                  );
+                }
+              );
+    
+            setOrders(
+              sortedOrders
             );
-
-          setOrders(
-            filteredOrders
-          );
-        }
-      );
-
-    return () => unsubscribe();
-  }, []);
+          }
+        );
+    
+      return () =>
+        unsubscribe();
+    }, []);
 
   return (
     <ScrollView
@@ -85,8 +106,7 @@ export default function CustomerOrdersScreen({
           <View
             key={order.id}
             style={{
-              backgroundColor:
-                "#ffffff",
+              backgroundColor: "#ffffff",
               padding: 20,
               borderRadius: 15,
               marginBottom: 20,
@@ -98,37 +118,55 @@ export default function CustomerOrdersScreen({
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                marginBottom: 15,
               }}
             >
-              Order #
-              {order.id?.slice(0, 6)}
+              📦 Order No:
             </Text>
 
-            {/* Products */}
-            <View
+            <Text
               style={{
+                fontSize: 20,
+                color: "#1976D2",
+                fontWeight: "bold",
+                marginTop: 5,
+              }}
+            >
+              {order.orderNumber || order.id}
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 16,
+                color: "gray",
                 marginBottom: 15,
               }}
             >
-              {order.items?.map(
-                (
-                  item: any,
-                  index: number
-                ) => (
-                  <Text
-                    key={index}
-                    style={{
-                      fontSize: 18,
-                      marginBottom: 5,
-                    }}
-                  >
-                    🥬 {item.name} -{" "}
-                    {item.quantity} KG
-                  </Text>
-                )
-              )}
-            </View>
+              Vendor: {order.vendorName}
+            </Text>
+          {/* Products */}
+
+          <View
+            style={{
+              marginBottom: 15,
+            }}
+          >
+            {order.items?.map(
+              (
+                item: any,
+                index: number
+              ) => (
+                <Text
+                  key={index}
+                  style={{
+                    fontSize: 18,
+                    marginBottom: 5,
+                  }}
+                >
+                  🥬 {item.name} - {item.displayQuantity}
+                </Text>
+              )
+            )}
+          </View>
 
             {/* Address */}
             <Text
