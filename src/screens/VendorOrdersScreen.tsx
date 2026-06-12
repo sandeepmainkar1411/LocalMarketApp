@@ -17,6 +17,7 @@ import {
 
 export default function VendorOrdersScreen({
   route,
+  navigation,
 }: any) {
   const vendor =
     route?.params?.vendor;
@@ -174,23 +175,7 @@ export default function VendorOrdersScreen({
                   "#ddd",
               }}
             >
-              <View
-                style={{
-                  marginBottom: 15,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: "gray",
-                    marginBottom: 5,
-                  }}
-                >
-                  Order No:
-                  {" "}
-                  {order.orderNumber || order.id}
-                </Text>
-
+              
                 <View
                   style={{
                     marginBottom: 15,
@@ -219,7 +204,7 @@ export default function VendorOrdersScreen({
                     {order.customerName}
                   </Text>
                 </View>
-              </View>
+              
 
               <Text
                 style={{
@@ -344,71 +329,48 @@ export default function VendorOrdersScreen({
                 }
               </Text>
 
+              
+
               <Text
                 style={{
                   fontSize: 22,
                   color:
-                    order.status ===
-                    "Delivered"
+                    order.status === "Delivered"
                       ? "green"
-                      : order.status ===
-                        "Rejected"
+                      : order.status === "Rejected"
                       ? "red"
                       : "orange",
-
-                  fontWeight:
-                    "bold",
-
+                  fontWeight: "bold",
                   marginBottom: 25,
                 }}
               >
-                Status:{" "}
-                {
-                  order.status
-                }
+                Status: {order.status}
               </Text>
 
-              {order.status ===
-                "Placed" && (
+              {order.status === "Placed" && (
                 <View
                   style={{
-                    flexDirection:
-                      "row",
-
-                    justifyContent:
-                      "space-between",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                   }}
                 >
                   <TouchableOpacity
                     onPress={() =>
-                      handleAccept(
-                        order.id
-                      )
+                      handleAccept(order.id)
                     }
                     style={{
-                      backgroundColor:
-                        "green",
-
+                      backgroundColor: "green",
                       padding: 18,
-
                       borderRadius: 12,
-
-                      width:
-                        "47%",
+                      width: "47%",
                     }}
                   >
                     <Text
                       style={{
-                        color:
-                          "white",
-
-                        textAlign:
-                          "center",
-
+                        color: "white",
+                        textAlign: "center",
                         fontSize: 20,
-
-                        fontWeight:
-                          "bold",
+                        fontWeight: "bold",
                       }}
                     >
                       Accept
@@ -417,34 +379,21 @@ export default function VendorOrdersScreen({
 
                   <TouchableOpacity
                     onPress={() =>
-                      handleReject(
-                        order.id
-                      )
+                      handleReject(order.id)
                     }
                     style={{
-                      backgroundColor:
-                        "red",
-
+                      backgroundColor: "red",
                       padding: 18,
-
                       borderRadius: 12,
-
-                      width:
-                        "47%",
+                      width: "47%",
                     }}
                   >
                     <Text
                       style={{
-                        color:
-                          "white",
-
-                        textAlign:
-                          "center",
-
+                        color: "white",
+                        textAlign: "center",
                         fontSize: 20,
-
-                        fontWeight:
-                          "bold",
+                        fontWeight: "bold",
                       }}
                     >
                       Reject
@@ -453,40 +402,58 @@ export default function VendorOrdersScreen({
                 </View>
               )}
 
-              {order.status ===
-                "Accepted" && (
-                <TouchableOpacity
-                  onPress={() =>
-                    handleOutForDelivery(
-                      order.id
-                    )
-                  }
-                  style={{
-                    backgroundColor:
-                      "#ff9800",
-
-                    padding: 18,
-
-                    borderRadius: 12,
-                  }}
-                >
-                  <Text
+              {order.status === "Accepted" && (
+                <View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate(
+                        "AgentAssignment",
+                        { order }
+                      )
+                    }
                     style={{
-                      color:
-                        "white",
-
-                      textAlign:
-                        "center",
-
-                      fontSize: 20,
-
-                      fontWeight:
-                        "bold",
+                      backgroundColor: "#673AB7",
+                      padding: 18,
+                      borderRadius: 12,
+                      marginBottom: 10,
                     }}
                   >
-                    Out For Delivery
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontSize: 20,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Assign Agent
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleOutForDelivery(
+                        order.id
+                      )
+                    }
+                    style={{
+                      backgroundColor: "#ff9800",
+                      padding: 18,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontSize: 20,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Out For Delivery
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               )}
 
               {order.status ===
@@ -498,26 +465,17 @@ export default function VendorOrdersScreen({
                     )
                   }
                   style={{
-                    backgroundColor:
-                      "#0066cc",
-
+                    backgroundColor: "#4CAF50",
                     padding: 18,
-
                     borderRadius: 12,
                   }}
                 >
                   <Text
                     style={{
-                      color:
-                        "white",
-
-                      textAlign:
-                        "center",
-
+                      color: "white",
+                      textAlign: "center",
                       fontSize: 20,
-
-                      fontWeight:
-                        "bold",
+                      fontWeight: "bold",
                     }}
                   >
                     Mark Delivered

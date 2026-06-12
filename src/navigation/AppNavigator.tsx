@@ -40,6 +40,7 @@ import VendorReviewsScreen from "../screens/VendorReviewsScreen";
 import AdminRevenueDashboardScreen from "../screens/AdminRevenueDashboardScreen";
 import AdminVendorCollectionScreen from "../screens/AdminVendorCollectionScreen";
 import VendorCollectionDetailsScreen from "../screens/VendorCollectionDetailsScreen";
+import AgentAssignmentScreen from "../screens/AgentAssignmentScreen";
 
 const Stack =
   createNativeStackNavigator();
@@ -289,6 +290,11 @@ export default function AppNavigator() {
         component={
           VendorReviewsScreen
         }
+      />
+
+      <Stack.Screen
+        name="AgentAssignment"
+        component={AgentAssignmentScreen}
       />
 
     
