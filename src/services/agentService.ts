@@ -88,3 +88,15 @@ active: !currentStatus,
 console.log(error);
 }
 };
+export const getAgentByMobile =
+  async (mobile: string) => {
+
+    const agents =
+      await fetchAgents();
+
+    return agents.find(
+      (agent) =>
+        String(agent.mobile) ===
+        String(mobile)
+    );
+  };

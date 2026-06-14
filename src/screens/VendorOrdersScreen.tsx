@@ -119,6 +119,25 @@ export default function VendorOrdersScreen({
       );
     };
 
+    const handleSettlement =
+    async (
+      orderId: string
+    ) => {
+  
+      await updateOrder(
+        orderId,
+        {
+          settlementStatus:
+            "Settled",
+  
+          settledAt:
+            new Date().toISOString(),
+        }
+      );
+    };
+
+  
+
   return (
     <ScrollView
       style={{
@@ -346,6 +365,94 @@ export default function VendorOrdersScreen({
               >
                 Status: {order.status}
               </Text>
+              {order.status ===
+                "Delivered" && (
+                <View
+                  style={{
+                    backgroundColor:
+                      "#E8F5E9",
+                    padding: 12,
+                    borderRadius: 10,
+                    marginBottom: 15,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Settlement:
+                    {" "}
+                    {order.settlementStatus ||
+                      "Pending"}
+                  </Text>
+
+                 
+                </View>
+              )}
+
+              {order.status === "Delivered" &&
+                order.settlementStatus !== "Settled" && (
+                <TouchableOpacity
+                  onPress={() =>
+                    handleSettlement(
+                      order.id
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#4CAF50",
+                    padding: 15,
+                    borderRadius: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Confirm Money Received
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {order.status === "Delivered" && (
+                <View
+                  style={{
+                    marginTop: 15,
+                    padding: 12,
+                    backgroundColor: "#E8F5E9",
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: 5,
+                    }}
+                  >
+                    Payment Details
+                  </Text>
+
+                  <Text>
+                    Mode: {order.paymentMode}
+                  </Text>
+
+                  <Text>
+                    Ref: {order.transactionId || "-"}
+                  </Text>
+
+                  <Text>
+                    Collected By: {order.collectedBy}
+                  </Text>
+
+                  <Text>
+                    Collected At: {order.collectedAt}
+                  </Text>
+                </View>
+              )}
 
               {order.status === "Placed" && (
                 <View

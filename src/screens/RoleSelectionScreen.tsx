@@ -54,6 +54,19 @@ export default function RoleSelectionScreen() {
           Continue as Admin
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.agentButton}
+        onPress={() =>
+          navigation.navigate(
+            "AgentLogin"
+          )
+        }
+      >
+        <Text style={styles.buttonText}>
+          Continue as Agent
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -89,6 +102,13 @@ const styles = StyleSheet.create({
 
   adminButton: {
     backgroundColor: "#212121",
+    padding: 18,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+
+  agentButton: {
+    backgroundColor: "#673AB7",
     padding: 18,
     borderRadius: 12,
     marginBottom: 20,

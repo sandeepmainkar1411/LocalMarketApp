@@ -41,6 +41,11 @@ import AdminRevenueDashboardScreen from "../screens/AdminRevenueDashboardScreen"
 import AdminVendorCollectionScreen from "../screens/AdminVendorCollectionScreen";
 import VendorCollectionDetailsScreen from "../screens/VendorCollectionDetailsScreen";
 import AgentAssignmentScreen from "../screens/AgentAssignmentScreen";
+import AgentLoginScreen from "../screens/AgentLoginScreen";
+import AgentOrdersScreen from "../screens/AgentOrdersScreen";
+import AgentPaymentScreen from "../screens/AgentPaymentScreen";
+import AdminSettlementScreen from "../screens/AdminSettlementScreen";
+
 
 const Stack =
   createNativeStackNavigator();
@@ -295,6 +300,29 @@ export default function AppNavigator() {
       <Stack.Screen
         name="AgentAssignment"
         component={AgentAssignmentScreen}
+      />
+
+      
+      <Stack.Screen
+        name="AgentOrders"
+        component={AgentOrdersScreen}
+      />
+
+      <Stack.Screen
+        name="AgentLogin"
+        component={AgentLoginScreen}
+      />
+
+      <Stack.Screen
+        name="AgentPayment"
+        component={AgentPaymentScreen}
+      />
+
+      <Stack.Screen
+        name="AdminSettlement"
+        component={
+          AdminSettlementScreen
+        }
       />
 
     

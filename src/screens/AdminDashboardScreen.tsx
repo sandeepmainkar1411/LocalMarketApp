@@ -183,6 +183,32 @@ export default function AdminDashboardScreen({
           💰 Vendor Collections
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(
+            "AdminSettlement"
+          )
+        }
+        style={{
+          backgroundColor:
+            "#009688",
+          padding: 18,
+          borderRadius: 12,
+          marginBottom: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 18,
+          }}
+        >
+          Settlement Dashboard
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
