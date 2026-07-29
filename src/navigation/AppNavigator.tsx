@@ -45,6 +45,8 @@ import AgentLoginScreen from "../screens/AgentLoginScreen";
 import AgentOrdersScreen from "../screens/AgentOrdersScreen";
 import AgentPaymentScreen from "../screens/AgentPaymentScreen";
 import AdminSettlementScreen from "../screens/AdminSettlementScreen";
+import VendorSettlementScreen from "../screens/VendorSettlementScreen";
+
 
 
 const Stack =
@@ -323,6 +325,11 @@ export default function AppNavigator() {
         component={
           AdminSettlementScreen
         }
+      />
+
+      <Stack.Screen
+        name="VendorSettlement"
+        component={VendorSettlementScreen}
       />
 
     

@@ -368,30 +368,15 @@ export default function VendorDashboardScreen({
       console.log(vendors);
     };
 
-  const handleDelete =
-    async (
+  const handleDelete = async (
       firestoreId: string
     ) => {
-      Alert.alert(
-        "Delete Product",
-        "Are you sure?",
-        [
-          {
-            text: "Cancel",
-          },
-          {
-            text: "Delete",
-            style:
-              "destructive",
-            onPress:
-              async () => {
-                await deleteProduct(
-                  firestoreId
-                );
-              },
-          },
-        ]
-      );
+    
+      console.log("Deleting:", firestoreId);
+    
+      await deleteProduct(firestoreId);
+    
+      console.log("Deleted");
     };
 
   return (
@@ -851,6 +836,39 @@ export default function VendorDashboardScreen({
             }}
           >
             ⭐ Customer Reviews
+          </Text>
+        </TouchableOpacity>
+
+                {/* 💰 Settlement History */}
+
+                <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              "VendorSettlement",
+              {
+                vendor,
+              }
+            )
+          }
+          style={{
+            backgroundColor:
+              "#00897B",
+            padding: 18,
+            borderRadius: 12,
+            marginBottom: 15,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign:
+                "center",
+              fontSize: 18,
+              fontWeight:
+                "bold",
+            }}
+          >
+            💰 Settlement History
           </Text>
         </TouchableOpacity>
 
