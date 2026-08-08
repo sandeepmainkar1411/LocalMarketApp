@@ -1,5 +1,8 @@
+
+
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import LoginScreen from "../screens/LoginScreen";
 import RoleSelectionScreen from "../screens/RoleSelectionScreen";
 import CustomerLoginScreen from "../screens/CustomerLoginScreen";
 import VendorLoginScreen from "../screens/VendorLoginScreen";
@@ -46,6 +49,7 @@ import AgentOrdersScreen from "../screens/AgentOrdersScreen";
 import AgentPaymentScreen from "../screens/AgentPaymentScreen";
 import AdminSettlementScreen from "../screens/AdminSettlementScreen";
 import VendorSettlementScreen from "../screens/VendorSettlementScreen";
+import SplashScreen from "../screens/SplashScreen";
 
 
 
@@ -55,16 +59,25 @@ const Stack =
 export default function AppNavigator() {
   return (
     <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
+    initialRouteName="Login"
+    screenOptions={{
+    headerShown:false,
+    }}
     >
-      {/* ROLE SELECTION */}
+    <Stack.Screen
+          name="Splash"
+          component={SplashScreen}
+      />
+      {/* LOGIN */}
+
       <Stack.Screen
-        name="RoleSelection"
-        component={
-          RoleSelectionScreen
-        }
+          name="Login"
+          component={LoginScreen}
+      />
+
+      <Stack.Screen
+          name="RoleSelection"
+          component={RoleSelectionScreen}
       />
 
       {/* CUSTOMER */}

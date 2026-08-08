@@ -1,17 +1,81 @@
+import React from "react";
+
 import {
   View,
   Text,
   TouchableOpacity,
+  Alert,
 } from "react-native";
+
+import {
+  logout,
+} from "../services/authService";
+
+import {
+  clearSession,
+} from "../services/sessionService";
 
 export default function CustomerDashboardScreen({
   navigation,
   route,
 }: any) {
+
   const customer =
     route?.params?.customer;
 
+    const performLogout = async () => {
+
+      Alert.alert(
+    
+        "Logout",
+    
+        "Are you sure you want to logout?",
+    
+        [
+    
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+    
+          {
+    
+            text: "Logout",
+    
+            style: "destructive",
+    
+            onPress: async () => {
+    
+              await clearSession();
+    
+              await logout();
+    
+              navigation.reset({
+    
+                index: 0,
+    
+                routes: [
+    
+                  {
+                    name: "Login",
+                  },
+    
+                ],
+    
+              });
+    
+            },
+    
+          },
+    
+        ]
+    
+      );
+    
+    };
+
   return (
+
     <View
       style={{
         flex: 1,
@@ -20,6 +84,7 @@ export default function CustomerDashboardScreen({
         backgroundColor: "#f5f5f5",
       }}
     >
+
       <Text
         style={{
           fontSize: 32,
@@ -30,8 +95,6 @@ export default function CustomerDashboardScreen({
       >
         Customer Dashboard
       </Text>
-
-      {/* Browse Vendors */}
 
       <TouchableOpacity
         onPress={() =>
@@ -60,8 +123,6 @@ export default function CustomerDashboardScreen({
           Browse Local Vendors
         </Text>
       </TouchableOpacity>
-
-      {/* My Orders */}
 
       <TouchableOpacity
         onPress={() =>
@@ -96,8 +157,7 @@ export default function CustomerDashboardScreen({
           navigation.navigate(
             "CustomerProfileView",
             {
-              customer:
-                route?.params?.customer,
+              customer,
             }
           )
         }
@@ -120,8 +180,6 @@ export default function CustomerDashboardScreen({
         </Text>
       </TouchableOpacity>
 
-      {/* Nearby Deals */}
-
       <TouchableOpacity
         style={{
           backgroundColor: "orange",
@@ -142,35 +200,30 @@ export default function CustomerDashboardScreen({
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name:
-                  "RoleSelection",
-              },
-            ],
-          })
-        }
+        onPress={performLogout}
         style={{
-          backgroundColor: "#d32f2f",
-          padding: 18,
-          borderRadius: 12,
-          marginTop: 20,
+          backgroundColor:"#d32f2f",
+          padding:18,
+          borderRadius:12,
+          marginTop:20,
         }}
       >
+
         <Text
           style={{
-            color: "white",
-            textAlign: "center",
-            fontWeight: "bold",
-            fontSize: 20,
+            color:"white",
+            textAlign:"center",
+            fontWeight:"bold",
+            fontSize:20,
           }}
         >
           Logout
         </Text>
+
       </TouchableOpacity>
+
     </View>
+
   );
+
 }

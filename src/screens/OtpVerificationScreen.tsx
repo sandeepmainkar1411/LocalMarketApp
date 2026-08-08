@@ -1,117 +1,165 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import React, {
+  useState,
+} from "react";
+
 import {
-  fetchCustomers,
-} from "../services/customerService";
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+
+import {
+  verifyOtp,
+} from "../services/authService";
 
 export default function OtpVerificationScreen({
   navigation,
   route,
 }: any) {
-  const [otp, setOtp] = useState("");
+
+  const [
+    otp,
+    setOtp,
+  ] = useState("");
+
+  const mobile =
+    route?.params?.mobile;
+
+  const user =
+    route?.params?.user;
+
+  const verify = async () => {
+
+    const result =
+      await verifyOtp(
+        otp
+      );
+
+    if (!result.success) {
+
+      alert(
+        result.message
+      );
+
+      return;
+
+    }
+
+    console.log(
+      "OTP VERIFIED"
+    );
+
+    console.log(
+      user
+    );
+
+    navigation.navigate(
+      "RoleSelection",
+      {
+        user,
+      }
+    );
+
+  };
 
   return (
+
     <View
       style={{
         flex: 1,
         justifyContent: "center",
-        padding: 20,
+        padding: 25,
+        backgroundColor: "#ffffff",
       }}
     >
+
       <Text
         style={{
-          fontSize: 30,
+          fontSize: 32,
           fontWeight: "bold",
           textAlign: "center",
-          marginBottom: 40,
         }}
       >
         Verify OTP
       </Text>
 
+      <Text
+        style={{
+          textAlign: "center",
+          color: "gray",
+          marginTop: 10,
+          marginBottom: 40,
+        }}
+      >
+        OTP sent to
+
+        {"\n"}
+
+        {mobile}
+      </Text>
+
       <TextInput
-        placeholder="Enter OTP"
         value={otp}
         onChangeText={setOtp}
         keyboardType="number-pad"
+        maxLength={6}
+        placeholder="Enter OTP"
         style={{
           borderWidth: 1,
-          borderColor: "#ccc",
+          borderColor: "#cccccc",
           borderRadius: 10,
           padding: 15,
-          marginBottom: 20,
+          fontSize: 18,
         }}
       />
 
-<TouchableOpacity
-  onPress={async () => {
-    try {
-      const mobile =
-        route?.params?.mobile;
+      <TouchableOpacity
+        onPress={verify}
+        style={{
+          marginTop: 30,
+          backgroundColor: "#2E7D32",
+          padding: 18,
+          borderRadius: 12,
+        }}
+      >
 
-      const customers =
-        await fetchCustomers();
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 18,
+          }}
+        >
+          Verify OTP
+        </Text>
 
-      const customer =
-        customers.find(
-          (item: any) =>
-            item.mobile === mobile
-        );
-
-      if (customer) {
-        navigation.navigate(
-          "CustomerDashboard",
-          {
-            customer,
-          }
-        );
-      } else {
-        navigation.navigate(
-          "CustomerProfile",
-          {
-            mobile,
-          }
-        );
-      }
-    } catch (error) {
-      console.log(
-        "OTP Error:",
-        error
-      );
-    }
-  }}
-  style={{
-    backgroundColor: "green",
-    padding: 15,
-    borderRadius: 10,
-  }}
->
-  <Text
-    style={{
-      color: "white",
-      textAlign: "center",
-      fontWeight: "bold",
-    }}
-  >
-    Verify OTP
-  </Text>
-</TouchableOpacity>
+      </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.goBack()}
+        onPress={() =>
+          navigation.goBack()
+        }
         style={{
           marginTop: 20,
         }}
       >
+
         <Text
           style={{
+            color: "#1976D2",
             textAlign: "center",
-            color: "blue",
+            fontSize: 16,
           }}
         >
           Back
         </Text>
+
       </TouchableOpacity>
+
     </View>
+
   );
+
 }

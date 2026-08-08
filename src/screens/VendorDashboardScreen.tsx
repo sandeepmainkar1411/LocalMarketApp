@@ -28,6 +28,14 @@ import {
   getVendorRating,
 } from "../services/ratingService";
 
+import {
+  logout,
+} from "../services/authService";
+
+import {
+  clearSession,
+} from "../services/sessionService";
+
 
 
 export default function VendorDashboardScreen({
@@ -378,6 +386,70 @@ export default function VendorDashboardScreen({
     
       console.log("Deleted");
     };
+
+  const performLogout = () => {
+
+    Alert.alert(
+
+      "Logout",
+
+      "Are you sure you want to logout?",
+
+      [
+
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+
+        {
+
+          text: "Logout",
+
+          style: "destructive",
+
+          onPress: async () => {
+
+            try {
+
+              await clearSession();
+
+              await logout();
+
+              navigation.reset({
+
+                index: 0,
+
+                routes: [
+
+                  {
+                    name: "CustomerLogin",
+                  },
+
+                ],
+
+              });
+
+            }
+            catch (error) {
+
+              console.log(error);
+
+              Alert.alert(
+                "Unable to logout."
+              );
+
+            }
+
+          },
+
+        },
+
+      ]
+
+    );
+
+  };
 
   return (
     <ScrollView
@@ -1053,6 +1125,29 @@ export default function VendorDashboardScreen({
             </View>
           )
         )}
+
+        <TouchableOpacity
+          onPress={performLogout}
+          style={{
+            backgroundColor: "#d32f2f",
+            padding: 18,
+            borderRadius: 12,
+            marginBottom: 40,
+          }}
+        >
+
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 18,
+            }}
+          >
+            Logout
+          </Text>
+
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
