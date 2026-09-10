@@ -26,8 +26,8 @@ export default function OtpVerificationScreen({
   const mobile =
     route?.params?.mobile;
 
-  const user =
-    route?.params?.user;
+  const isNewUser =
+    route?.params?.isNewUser === true;
 
   const verify = async () => {
 
@@ -51,13 +51,46 @@ export default function OtpVerificationScreen({
     );
 
     console.log(
-      user
+      "Mobile:",
+      mobile
     );
 
+    console.log(
+      "New User:",
+      isNewUser
+    );
+
+    /*
+     * NEW USER
+     *
+     * OTP has been successfully
+     * verified.
+     *
+     * Now start the registration
+     * process.
+     */
+    if (isNewUser) {
+
+      navigation.navigate(
+        "NewUserRegistration",
+        {
+          mobile,
+        }
+      );
+
+      return;
+
+    }
+
+    /*
+     * EXISTING USER
+     *
+     * Continue to role selection.
+     */
     navigation.navigate(
       "RoleSelection",
       {
-        user,
+        mobile,
       }
     );
 

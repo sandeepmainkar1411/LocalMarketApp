@@ -50,7 +50,8 @@ import AgentPaymentScreen from "../screens/AgentPaymentScreen";
 import AdminSettlementScreen from "../screens/AdminSettlementScreen";
 import VendorSettlementScreen from "../screens/VendorSettlementScreen";
 import SplashScreen from "../screens/SplashScreen";
-
+import NewUserRegistrationScreen from "../screens/NewUserRegistrationScreen";
+import CustomerRegistrationScreen from "../screens/CustomerRegistrationScreen";
 
 
 const Stack =
@@ -59,7 +60,7 @@ const Stack =
 export default function AppNavigator() {
   return (
     <Stack.Navigator
-    initialRouteName="Login"
+    initialRouteName="Splash"
     screenOptions={{
     headerShown:false,
     }}
@@ -130,17 +131,13 @@ export default function AppNavigator() {
       />
 
       <Stack.Screen
-        name="VendorTerms"
-        component={
-          VendorTermsScreen
-        }
+        name="VendorProfile"
+        component={VendorProfileScreen}
       />
 
       <Stack.Screen
-        name="VendorProfile"
-        component={
-          VendorProfileScreen
-        }
+        name="VendorTerms"
+        component={VendorTermsScreen}
       />
 
       <Stack.Screen
@@ -184,6 +181,16 @@ export default function AppNavigator() {
         component={
           OtpVerificationScreen
         }
+      />
+
+      <Stack.Screen
+        name="NewUserRegistration"
+        component={NewUserRegistrationScreen}
+      />
+
+      <Stack.Screen
+        name="CustomerRegistration"
+        component={CustomerRegistrationScreen}
       />
 
       {/* PRODUCTS */}

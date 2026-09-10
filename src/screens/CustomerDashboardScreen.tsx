@@ -4,16 +4,12 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
 } from "react-native";
-
-import {
-  logout,
-} from "../services/authService";
 
 import {
   clearSession,
 } from "../services/sessionService";
+
 
 export default function CustomerDashboardScreen({
   navigation,
@@ -23,56 +19,48 @@ export default function CustomerDashboardScreen({
   const customer =
     route?.params?.customer;
 
-    const performLogout = async () => {
 
-      Alert.alert(
-    
-        "Logout",
-    
-        "Are you sure you want to logout?",
-    
-        [
-    
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-    
-          {
-    
-            text: "Logout",
-    
-            style: "destructive",
-    
-            onPress: async () => {
-    
-              await clearSession();
-    
-              await logout();
-    
-              navigation.reset({
-    
-                index: 0,
-    
-                routes: [
-    
-                  {
-                    name: "Login",
-                  },
-    
-                ],
-    
-              });
-    
-            },
-    
-          },
-    
-        ]
-    
+  const performLogout =
+    async () => {
+
+      console.log(
+        "LOGOUT BUTTON PRESSED"
       );
-    
+
+      try {
+
+        const result =
+          await clearSession();
+
+        console.log(
+          "CLEAR SESSION RESULT:",
+          result
+        );
+
+
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "Login",
+            },
+          ],
+        });
+
+      }
+      catch (error) {
+
+        console.log(
+          "LOGOUT ERROR:",
+          error
+        );
+
+        alert(
+          "Logout error. Check the console."
+        );
+      }
     };
+
 
   return (
 
@@ -96,6 +84,9 @@ export default function CustomerDashboardScreen({
         Customer Dashboard
       </Text>
 
+
+      {/* Browse Local Vendors */}
+
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(
@@ -112,6 +103,7 @@ export default function CustomerDashboardScreen({
           marginBottom: 20,
         }}
       >
+
         <Text
           style={{
             color: "white",
@@ -122,7 +114,11 @@ export default function CustomerDashboardScreen({
         >
           Browse Local Vendors
         </Text>
+
       </TouchableOpacity>
+
+
+      {/* My Orders */}
 
       <TouchableOpacity
         onPress={() =>
@@ -140,6 +136,7 @@ export default function CustomerDashboardScreen({
           marginBottom: 20,
         }}
       >
+
         <Text
           style={{
             color: "white",
@@ -150,14 +147,19 @@ export default function CustomerDashboardScreen({
         >
           My Orders
         </Text>
+
       </TouchableOpacity>
+
+
+      {/* My Profile */}
 
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(
             "CustomerProfileView",
             {
-              customer,
+              mobile:
+                customer?.mobile,
             }
           )
         }
@@ -168,6 +170,7 @@ export default function CustomerDashboardScreen({
           marginBottom: 20,
         }}
       >
+
         <Text
           style={{
             color: "white",
@@ -178,7 +181,11 @@ export default function CustomerDashboardScreen({
         >
           My Profile
         </Text>
+
       </TouchableOpacity>
+
+
+      {/* Nearby Deals */}
 
       <TouchableOpacity
         style={{
@@ -187,6 +194,7 @@ export default function CustomerDashboardScreen({
           borderRadius: 12,
         }}
       >
+
         <Text
           style={{
             color: "white",
@@ -197,24 +205,30 @@ export default function CustomerDashboardScreen({
         >
           View Nearby Deals
         </Text>
+
       </TouchableOpacity>
 
+
+      {/* Logout */}
+
       <TouchableOpacity
-        onPress={performLogout}
+        onPress={
+          performLogout
+        }
         style={{
-          backgroundColor:"#d32f2f",
-          padding:18,
-          borderRadius:12,
-          marginTop:20,
+          backgroundColor: "#d32f2f",
+          padding: 18,
+          borderRadius: 12,
+          marginTop: 20,
         }}
       >
 
         <Text
           style={{
-            color:"white",
-            textAlign:"center",
-            fontWeight:"bold",
-            fontSize:20,
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 20,
           }}
         >
           Logout
@@ -223,7 +237,5 @@ export default function CustomerDashboardScreen({
       </TouchableOpacity>
 
     </View>
-
   );
-
 }

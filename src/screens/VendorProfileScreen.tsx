@@ -1,3 +1,8 @@
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import {
   View,
   Text,
@@ -5,12 +10,8 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Platform,
 } from "react-native";
-
-import {
-  useState,
-  useEffect,
-} from "react";
 
 import {
   createVendor,
@@ -24,7 +25,12 @@ import {
 
 export default function VendorProfileScreen({
   navigation,
+  route,
 }: any) {
+  // Mobile number verified through OTP
+  const verifiedMobile =
+    route?.params?.mobile || "";
+
   const [vendorName, setVendorName] =
     useState("");
 
@@ -32,7 +38,7 @@ export default function VendorProfileScreen({
     useState("");
 
   const [mobile, setMobile] =
-    useState("");
+    useState(verifiedMobile);
 
   const [locality, setLocality] =
     useState("");
@@ -42,6 +48,13 @@ export default function VendorProfileScreen({
 
   const [localities, setLocalities] =
     useState<any[]>([]);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  useEffect(() => {
+    setMobile(verifiedMobile);
+  }, [verifiedMobile]);
 
   useEffect(() => {
     const unsubscribe =
@@ -55,12 +68,16 @@ export default function VendorProfileScreen({
   }, []);
 
   const saveProfile = async () => {
+    if (saving) {
+      return;
+    }
+
     if (
-      !vendorName ||
-      !ownerName ||
-      !mobile ||
-      !locality ||
-      !address
+      !vendorName.trim() ||
+      !ownerName.trim() ||
+      !mobile.trim() ||
+      !locality.trim() ||
+      !address.trim()
     ) {
       Alert.alert(
         "Validation",
@@ -70,11 +87,42 @@ export default function VendorProfileScreen({
     }
 
     try {
+      setSaving(true);
+
+      console.log(
+        "SAVE PROFILE CLICKED"
+      );
+
+      console.log(
+        "Vendor:",
+        vendorName
+      );
+
+      console.log(
+        "Owner:",
+        ownerName
+      );
+
+      console.log(
+        "Mobile:",
+        mobile
+      );
+
+      console.log(
+        "Locality:",
+        locality
+      );
+
       const exists =
         await vendorExists(
-          vendorName,
+          vendorName.trim(),
           locality
         );
+
+      console.log(
+        "VENDOR NAME CHECK RESULT:",
+        exists
+      );
 
       if (exists) {
         Alert.alert(
@@ -87,12 +135,15 @@ export default function VendorProfileScreen({
 
       const mobileAlreadyExists =
         await mobileExists(
-          mobile
+          mobile.trim()
         );
 
-      if (
+      console.log(
+        "MOBILE CHECK RESULT:",
         mobileAlreadyExists
-      ) {
+      );
+
+      if (mobileAlreadyExists) {
         Alert.alert(
           "Duplicate Mobile",
           `Mobile number ${mobile} is already registered`
@@ -102,37 +153,145 @@ export default function VendorProfileScreen({
       }
 
       await createVendor({
-        vendorName,
-        ownerName,
-        mobile,
+        vendorName:
+          vendorName.trim(),
+
+        ownerName:
+          ownerName.trim(),
+
+        mobile:
+          mobile.trim(),
+
         locality,
-        address,
-      
+
+        address:
+          address.trim(),
+
         active: false,
-      
+
         approvalStatus:
           "Pending",
-      
+
         createdAt:
           new Date().toISOString(),
       });
 
-      Alert.alert(
-        "Registration Submitted",
-        "Your vendor profile has been submitted for admin approval."
+      console.log(
+        "VENDOR REGISTRATION SAVED"
       );
+
+      if (Platform.OS === "web") {
+        window.alert(
+          "Registration Submitted\n\nYour vendor profile has been submitted for admin approval."
+        );
       
-      navigation.navigate(
-        "VendorApprovalPending"
+        navigation.navigate(
+          "VendorApprovalPending",
+          {
+            mobile: mobile.trim(),
+          }
+        );
+      } else {
+        Alert.alert(
+          "Registration Submitted",
+          "Your vendor profile has been submitted for admin approval.",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                navigation.navigate(
+                  "VendorApprovalPending",
+                  {
+                    mobile: mobile.trim(),
+                  }
+                );
+              },
+            },
+          ]
+        );
+      }
+    } catch (error: any) {
+      console.log(
+        "Vendor profile save error:",
+        error
       );
-    } catch (error) {
-      console.log(error);
 
       Alert.alert(
         "Error",
-        "Failed to save vendor profile"
+        error?.message ||
+          "Failed to save vendor profile"
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /*
+   * Expo Web:
+   * Use a native HTML button because
+   * React Native TouchableOpacity has
+   * already shown inconsistent press
+   * handling on this particular screen.
+   */
+  const renderSaveButton = () => {
+    if (Platform.OS === "web") {
+      return (
+        <button
+          type="button"
+          onClick={saveProfile}
+          disabled={saving}
+          style={{
+            width: "100%",
+            backgroundColor: saving
+              ? "#777777"
+              : "green",
+            padding: "18px",
+            borderRadius: "10px",
+            border: "none",
+            marginTop: "10px",
+            cursor: saving
+              ? "default"
+              : "pointer",
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "white",
+          }}
+        >
+          {saving
+            ? "Saving..."
+            : "Save Profile"}
+        </button>
       );
     }
+
+    return (
+      <TouchableOpacity
+        disabled={saving}
+        onPress={saveProfile}
+        style={{
+          backgroundColor:
+            saving
+              ? "#777777"
+              : "green",
+          padding: 18,
+          borderRadius: 10,
+          marginTop: 10,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontSize: 18,
+            fontWeight: "bold",
+          }}
+        >
+          {saving
+            ? "Saving..."
+            : "Save Profile"}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -180,11 +339,14 @@ export default function VendorProfileScreen({
         <TextInput
           placeholder="Mobile Number"
           value={mobile}
-          onChangeText={
-            setMobile
-          }
+          editable={false}
           keyboardType="phone-pad"
-          style={inputStyle}
+          style={{
+            ...inputStyle,
+            backgroundColor:
+              "#e9e9e9",
+            color: "#555555",
+          }}
         />
 
         <Text
@@ -257,31 +419,7 @@ export default function VendorProfileScreen({
           style={inputStyle}
         />
 
-        <TouchableOpacity
-          onPress={
-            saveProfile
-          }
-          style={{
-            backgroundColor:
-              "green",
-            padding: 18,
-            borderRadius: 10,
-            marginTop: 10,
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign:
-                "center",
-              fontSize: 18,
-              fontWeight:
-                "bold",
-            }}
-          >
-            Save Profile
-          </Text>
-        </TouchableOpacity>
+        {renderSaveButton()}
       </View>
     </ScrollView>
   );

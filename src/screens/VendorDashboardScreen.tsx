@@ -1,3 +1,8 @@
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import {
   View,
   Text,
@@ -5,11 +10,6 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-
-import {
-  useEffect,
-  useState,
-} from "react";
 
 import {
   subscribeToProducts,
@@ -37,11 +37,11 @@ import {
 } from "../services/sessionService";
 
 
-
 export default function VendorDashboardScreen({
   navigation,
   route,
 }: any) {
+
   const vendor =
     route?.params?.vendor;
 
@@ -57,39 +57,36 @@ export default function VendorDashboardScreen({
 
   const [products, setProducts] =
     useState<any[]>([]);
-  
+
   const [todayOrders, setTodayOrders] =
     useState(0);
-  
+
   const [todayRevenue, setTodayRevenue] =
     useState(0);
-  
+
   const [totalOrders, setTotalOrders] =
     useState(0);
-  
+
   const [pendingOrders, setPendingOrders] =
     useState(0);
-  
+
   const [averageRating, setAverageRating] =
     useState(0);
-  
+
   const [totalReviews, setTotalReviews] =
     useState(0);
 
-  const [topProduct,
-      setTopProduct] =
-      useState("");
-    
-  const [topProductCount,
-      setTopProductCount] =
-      useState(0);
+  const [topProduct, setTopProduct] =
+    useState("");
 
-  const [lifetimeRevenue,
-    setLifetimeRevenue] =
+  const [topProductCount, setTopProductCount] =
+    useState(0);
+
+  const [lifetimeRevenue, setLifetimeRevenue] =
     useState(0);
 
   const [monthRevenue, setMonthRevenue] =
-  useState(0);
+    useState(0);
 
   const [repeatCustomers, setRepeatCustomers] =
     useState(0);
@@ -97,10 +94,17 @@ export default function VendorDashboardScreen({
   const [vendorRank, setVendorRank] =
     useState(1);
 
+
+  /*
+   * LOAD VENDOR PRODUCTS
+   */
+
   useEffect(() => {
+
     const unsubscribe =
       subscribeToProducts(
         (allProducts: any[]) => {
+
           const myProducts =
             allProducts.filter(
               (product) =>
@@ -111,74 +115,118 @@ export default function VendorDashboardScreen({
           setProducts(
             myProducts
           );
+
         }
       );
 
     return unsubscribe;
+
   }, [vendorName]);
 
+
+  /*
+   * LOAD VENDOR ORDERS
+   */
+
   useEffect(() => {
+
     const unsubscribe =
       subscribeToOrders(
         async (orders: any[]) => {
+
           const vendorOrders =
             orders.filter(
               (order) =>
                 order.vendorName ===
                 vendorName
             );
-  
+
+
+          /*
+           * TOTAL ORDERS
+           */
+
           setTotalOrders(
             vendorOrders.length
           );
-  
+
+
+          /*
+           * PENDING ORDERS
+           */
+
           const pending =
             vendorOrders.filter(
               (order) =>
                 order.status ===
                 "Placed"
             );
-  
+
           setPendingOrders(
             pending.length
           );
-  
-          const today = new Date()
-            .toISOString()
-            .split("T")[0];
 
-            const todaysOrdersList =
-            vendorOrders.filter((order) => {
-              if (!order.createdAt) {
-                return false;
+
+          /*
+           * TODAY'S ORDERS
+           */
+
+          const today =
+            new Date()
+              .toISOString()
+              .split("T")[0];
+
+          const todaysOrdersList =
+            vendorOrders.filter(
+              (order) => {
+
+                if (!order.createdAt) {
+                  return false;
+                }
+
+                let orderDate =
+                  "";
+
+                if (
+                  typeof order.createdAt ===
+                  "string"
+                ) {
+
+                  orderDate =
+                    order.createdAt
+                      .split("T")[0];
+
+                } else if (
+                  order.createdAt?.toDate
+                ) {
+
+                  orderDate =
+                    order.createdAt
+                      .toDate()
+                      .toISOString()
+                      .split("T")[0];
+
+                }
+
+                return (
+                  orderDate ===
+                  today
+                );
+
               }
-          
-              let orderDate = "";
-          
-              if (
-                typeof order.createdAt ===
-                "string"
-              ) {
-                orderDate =
-                  order.createdAt.split("T")[0];
-              } else if (
-                order.createdAt?.toDate
-              ) {
-                orderDate =
-                  order.createdAt
-                    .toDate()
-                    .toISOString()
-                    .split("T")[0];
-              }
-          
-              return orderDate === today;
-            });
-          
+            );
+
+
           setTodayOrders(
             todaysOrdersList.length
           );
-          
-          const revenue =
+
+
+          /*
+           * TODAY'S REVENUE
+           */
+
+          const todayRevenueValue =
             todaysOrdersList.reduce(
               (
                 sum: number,
@@ -190,10 +238,15 @@ export default function VendorDashboardScreen({
                 ),
               0
             );
-          
+
           setTodayRevenue(
-            revenue
+            todayRevenueValue
           );
+
+
+          /*
+           * LIFETIME REVENUE
+           */
 
           const totalRevenue =
             vendorOrders.reduce(
@@ -212,6 +265,11 @@ export default function VendorDashboardScreen({
             totalRevenue
           );
 
+
+          /*
+           * THIS MONTH REVENUE
+           */
+
           const currentMonth =
             new Date().getMonth();
 
@@ -219,41 +277,59 @@ export default function VendorDashboardScreen({
             new Date().getFullYear();
 
           const monthlyOrders =
-            vendorOrders.filter((order) => {
-              if (!order.createdAt)
-                return false;
+            vendorOrders.filter(
+              (order) => {
 
-              let orderDate;
+                if (!order.createdAt) {
+                  return false;
+                }
 
-              if (
-                typeof order.createdAt ===
-                "string"
-              ) {
-                orderDate = new Date(
-                  order.createdAt
+                let orderDate: Date;
+
+                if (
+                  typeof order.createdAt ===
+                  "string"
+                ) {
+
+                  orderDate =
+                    new Date(
+                      order.createdAt
+                    );
+
+                } else if (
+                  order.createdAt?.toDate
+                ) {
+
+                  orderDate =
+                    order.createdAt.toDate();
+
+                } else {
+
+                  return false;
+
+                }
+
+                return (
+                  orderDate.getMonth() ===
+                    currentMonth &&
+                  orderDate.getFullYear() ===
+                    currentYear
                 );
-              } else if (
-                order.createdAt?.toDate
-              ) {
-                orderDate =
-                  order.createdAt.toDate();
-              } else {
-                return false;
-              }
 
-              return (
-                orderDate.getMonth() ===
-                  currentMonth &&
-                orderDate.getFullYear() ===
-                  currentYear
-              );
-            });
+              }
+            );
+
 
           const monthlyRevenue =
             monthlyOrders.reduce(
-              (sum, order) =>
+              (
+                sum: number,
+                order: any
+              ) =>
                 sum +
-                Number(order.total || 0),
+                Number(
+                  order.total || 0
+                ),
               0
             );
 
@@ -261,197 +337,317 @@ export default function VendorDashboardScreen({
             monthlyRevenue
           );
 
-          const customerMap: any = {};
 
-            vendorOrders.forEach(
-              (order) => {
-                const mobile =
-                  order.customerMobile;
+          /*
+           * REPEAT CUSTOMERS
+           */
+
+          const customerMap: any =
+            {};
+
+          vendorOrders.forEach(
+            (order) => {
+
+              const mobile =
+                order.customerMobile;
+
+              if (mobile) {
 
                 customerMap[mobile] =
-                  (customerMap[mobile] || 0) + 1;
+                  (
+                    customerMap[mobile] ||
+                    0
+                  ) + 1;
+
               }
-            );
-
-            const repeatCount =
-              Object.values(
-                customerMap
-              ).filter(
-                (count: any) =>
-                  Number(count) > 1
-              ).length;
-
-            setRepeatCustomers(
-              repeatCount
-            );
-
-            setVendorRank(1);
-
-          const productCounter: any = {};
-
-            vendorOrders.forEach(
-              (order) => {
-                order.items?.forEach(
-                  (item: any) => {
-                    const productName =
-                      item.name;
-
-                    productCounter[
-                      productName
-                    ] =
-                      (
-                        productCounter[
-                          productName
-                        ] || 0
-                      ) +
-                      Number(
-                        item.quantity || 0
-                      );
-                  }
-                );
-              }
-            );
-
-            let bestProduct = "";
-            let bestCount = 0;
-
-            Object.keys(
-              productCounter
-            ).forEach(
-              (product) => {
-                if (
-                  productCounter[
-                    product
-                  ] > bestCount
-                ) {
-                  bestCount =
-                    productCounter[
-                      product
-                    ];
-
-                  bestProduct =
-                    product;
-                }
-              }
-            );
-
-            setTopProduct(
-              bestProduct
-            );
-
-            setTopProductCount(
-              bestCount
-            );
-  
-          const ratingData =
-            await getVendorRating(
-              vendorName
-            );
-  
-          setAverageRating(
-            ratingData.average
-          );
-  
-          setTotalReviews(
-            ratingData.totalReviews
-          );
-        }
-      );
-  
-    return () =>
-      unsubscribe();
-  }, [vendorName]);
-
-  
-
-  const testVendors =
-    async () => {
-      const vendors =
-        await fetchVendors();
-
-      console.log(
-        "VENDORS FROM FIREBASE:"
-      );
-
-      console.log(vendors);
-    };
-
-  const handleDelete = async (
-      firestoreId: string
-    ) => {
-    
-      console.log("Deleting:", firestoreId);
-    
-      await deleteProduct(firestoreId);
-    
-      console.log("Deleted");
-    };
-
-  const performLogout = () => {
-
-    Alert.alert(
-
-      "Logout",
-
-      "Are you sure you want to logout?",
-
-      [
-
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-
-        {
-
-          text: "Logout",
-
-          style: "destructive",
-
-          onPress: async () => {
-
-            try {
-
-              await clearSession();
-
-              await logout();
-
-              navigation.reset({
-
-                index: 0,
-
-                routes: [
-
-                  {
-                    name: "CustomerLogin",
-                  },
-
-                ],
-
-              });
 
             }
-            catch (error) {
+          );
 
-              console.log(error);
 
-              Alert.alert(
-                "Unable to logout."
+          const repeatCount =
+            Object.values(
+              customerMap
+            ).filter(
+              (count: any) =>
+                Number(count) > 1
+            ).length;
+
+          setRepeatCustomers(
+            repeatCount
+          );
+
+
+          /*
+           * VENDOR RANK
+           *
+           * For now this is #1.
+           * We can make this dynamic later.
+           */
+
+          setVendorRank(1);
+
+
+          /*
+           * TOP SELLING PRODUCT
+           */
+
+          const productCounter: any =
+            {};
+
+          vendorOrders.forEach(
+            (order) => {
+
+              order.items?.forEach(
+                (item: any) => {
+
+                  const productName =
+                    item.name ||
+                    item.vegetable ||
+                    "Unknown";
+
+                  productCounter[
+                    productName
+                  ] =
+                    (
+                      productCounter[
+                        productName
+                      ] || 0
+                    ) +
+                    Number(
+                      item.quantity || 0
+                    );
+
+                }
               );
 
             }
+          );
 
+
+          let bestProduct =
+            "";
+
+          let bestCount =
+            0;
+
+
+          Object.keys(
+            productCounter
+          ).forEach(
+            (product) => {
+
+              if (
+                productCounter[
+                  product
+                ] > bestCount
+              ) {
+
+                bestCount =
+                  productCounter[
+                    product
+                  ];
+
+                bestProduct =
+                  product;
+
+              }
+
+            }
+          );
+
+
+          setTopProduct(
+            bestProduct
+          );
+
+          setTopProductCount(
+            bestCount
+          );
+
+
+          /*
+           * VENDOR RATING
+           */
+
+          try {
+
+            const ratingData =
+              await getVendorRating(
+                vendorName
+              );
+
+            setAverageRating(
+              ratingData.average
+            );
+
+            setTotalReviews(
+              ratingData.totalReviews
+            );
+
+          } catch (ratingError) {
+
+            console.log(
+              "Rating Error:",
+              ratingError
+            );
+
+          }
+
+        }
+      );
+
+    return () =>
+      unsubscribe();
+
+  }, [vendorName]);
+
+
+  /*
+   * TEST VENDORS
+   */
+
+  const testVendors =
+    async () => {
+
+      try {
+
+        const vendors =
+          await fetchVendors();
+
+        console.log(
+          "VENDORS FROM FIREBASE:"
+        );
+
+        console.log(
+          vendors
+        );
+
+      } catch (error) {
+
+        console.log(
+          "Test Vendors Error:",
+          error
+        );
+
+      }
+
+    };
+
+
+  /*
+   * DELETE PRODUCT
+   */
+
+  const handleDelete =
+    async (
+      firestoreId: string
+    ) => {
+
+      Alert.alert(
+        "Delete Product",
+        "Are you sure?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
           },
+          {
+            text: "Delete",
+            style: "destructive",
 
+            onPress:
+              async () => {
+
+                try {
+
+                  await deleteProduct(
+                    firestoreId
+                  );
+
+                } catch (error) {
+
+                  console.log(
+                    "Delete Product Error:",
+                    error
+                  );
+
+                  Alert.alert(
+                    "Error",
+                    "Unable to delete product."
+                  );
+
+                }
+
+              },
+          },
+        ]
+      );
+
+    };
+
+
+  /*
+   * LOGOUT
+   */
+
+  const performLogout = async () => {
+
+    console.log("VENDOR LOGOUT CLICKED");
+  
+    try {
+  
+      // Clear Grovio local session first
+      await clearSession();
+  
+      console.log(
+        "GROVIO SESSION CLEARED"
+      );
+  
+    } catch (error) {
+  
+      console.log(
+        "Session clear error:",
+        error
+      );
+  
+    }
+  
+    try {
+  
+      // Firebase logout
+      await logout();
+  
+      console.log(
+        "FIREBASE LOGOUT SUCCESS"
+      );
+  
+    } catch (error) {
+  
+      // Firebase may not have an active
+      // authenticated session during DEV OTP.
+      console.log(
+        "Firebase logout skipped:",
+        error
+      );
+  
+    }
+  
+    // Always return to the main Login screen
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: "Login",
         },
-
-      ]
-
-    );
-
+      ],
+    });
+  
   };
 
+
   return (
+
     <ScrollView
       style={{
         flex: 1,
@@ -459,6 +655,7 @@ export default function VendorDashboardScreen({
           "#f5f5f5",
       }}
     >
+
       <View
         style={{
           padding: 20,
@@ -467,21 +664,23 @@ export default function VendorDashboardScreen({
           alignSelf: "center",
         }}
       >
+
+        {/* VENDOR NAME */}
+
         <Text
           style={{
             fontSize: 32,
             fontWeight: "bold",
-            textAlign:
-              "center",
+            textAlign: "center",
           }}
         >
           {vendorName}
         </Text>
 
+
         <Text
           style={{
-            textAlign:
-              "center",
+            textAlign: "center",
             color: "gray",
             marginTop: 5,
             marginBottom: 30,
@@ -490,26 +689,37 @@ export default function VendorDashboardScreen({
           Vendor Dashboard 🛒
         </Text>
 
+
+        {/* STATISTICS */}
+
         <View
           style={{
             flexDirection: "row",
             flexWrap: "wrap",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
             marginBottom: 25,
           }}
         >
-          {/* Today's Orders */}
+
+          {/* TODAY'S ORDERS */}
 
           <View
             style={{
-              backgroundColor: "#2196F3",
+              backgroundColor:
+                "#2196F3",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Today's Orders
             </Text>
 
@@ -522,20 +732,28 @@ export default function VendorDashboardScreen({
             >
               {todayOrders}
             </Text>
+
           </View>
 
-          {/* Today's Revenue */}
+
+          {/* TODAY'S REVENUE */}
 
           <View
             style={{
-              backgroundColor: "#4CAF50",
+              backgroundColor:
+                "#4CAF50",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Today's Revenue
             </Text>
 
@@ -548,20 +766,28 @@ export default function VendorDashboardScreen({
             >
               ₹{todayRevenue}
             </Text>
+
           </View>
 
-          {/* This Month Revenue */}
+
+          {/* THIS MONTH */}
 
           <View
             style={{
-              backgroundColor: "#009688",
+              backgroundColor:
+                "#009688",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               This Month Revenue
             </Text>
 
@@ -574,20 +800,28 @@ export default function VendorDashboardScreen({
             >
               ₹{monthRevenue}
             </Text>
+
           </View>
 
-          {/* Lifetime Revenue */}
+
+          {/* LIFETIME */}
 
           <View
             style={{
-              backgroundColor: "#673AB7",
+              backgroundColor:
+                "#673AB7",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Lifetime Revenue
             </Text>
 
@@ -600,20 +834,28 @@ export default function VendorDashboardScreen({
             >
               ₹{lifetimeRevenue}
             </Text>
+
           </View>
 
-          {/* Total Orders */}
+
+          {/* TOTAL ORDERS */}
 
           <View
             style={{
-              backgroundColor: "#3F51B5",
+              backgroundColor:
+                "#3F51B5",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Total Orders
             </Text>
 
@@ -626,20 +868,28 @@ export default function VendorDashboardScreen({
             >
               {totalOrders}
             </Text>
+
           </View>
 
-          {/* Pending Orders */}
+
+          {/* PENDING */}
 
           <View
             style={{
-              backgroundColor: "#FF9800",
+              backgroundColor:
+                "#FF9800",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Pending
             </Text>
 
@@ -652,20 +902,28 @@ export default function VendorDashboardScreen({
             >
               {pendingOrders}
             </Text>
+
           </View>
 
-          {/* Repeat Customers */}
+
+          {/* REPEAT CUSTOMERS */}
 
           <View
             style={{
-              backgroundColor: "#E91E63",
+              backgroundColor:
+                "#E91E63",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Repeat Customers
             </Text>
 
@@ -678,20 +936,28 @@ export default function VendorDashboardScreen({
             >
               {repeatCustomers}
             </Text>
+
           </View>
 
-          {/* Vendor Rank */}
+
+          {/* VENDOR RANK */}
 
           <View
             style={{
-              backgroundColor: "#795548",
+              backgroundColor:
+                "#795548",
               width: "48%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: "white" }}>
+
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
               Vendor Rank
             </Text>
 
@@ -704,19 +970,23 @@ export default function VendorDashboardScreen({
             >
               #{vendorRank}
             </Text>
+
           </View>
 
-          {/* Average Rating */}
+
+          {/* AVERAGE RATING */}
 
           <View
             style={{
-              backgroundColor: "#FFC107",
+              backgroundColor:
+                "#FFC107",
               width: "100%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 10,
             }}
           >
+
             <Text
               style={{
                 fontWeight: "bold",
@@ -733,22 +1003,28 @@ export default function VendorDashboardScreen({
               }}
             >
               {averageRating > 0
-                ? `⭐ ${averageRating.toFixed(1)} (${totalReviews})`
+                ? `⭐ ${averageRating.toFixed(
+                    1
+                  )} (${totalReviews})`
                 : "No Ratings Yet"}
             </Text>
+
           </View>
 
-          {/* Top Selling Product */}
+
+          {/* TOP SELLING PRODUCT */}
 
           <View
             style={{
-              backgroundColor: "#fff",
+              backgroundColor:
+                "#ffffff",
               width: "100%",
               padding: 15,
               borderRadius: 12,
               marginBottom: 25,
             }}
           >
+
             <Text
               style={{
                 fontWeight: "bold",
@@ -776,10 +1052,13 @@ export default function VendorDashboardScreen({
             >
               {topProductCount} Sold
             </Text>
+
           </View>
+
         </View>
 
-        {/* Add Product */}
+
+        {/* ADD PRODUCT */}
 
         <TouchableOpacity
           onPress={() =>
@@ -798,21 +1077,22 @@ export default function VendorDashboardScreen({
             marginBottom: 15,
           }}
         >
+
           <Text
             style={{
               color: "white",
-              textAlign:
-                "center",
+              textAlign: "center",
               fontSize: 18,
-              fontWeight:
-                "bold",
+              fontWeight: "bold",
             }}
           >
             Add Product
           </Text>
+
         </TouchableOpacity>
 
-        {/* View Orders */}
+
+        {/* VIEW ORDERS */}
 
         <TouchableOpacity
           onPress={() =>
@@ -831,21 +1111,22 @@ export default function VendorDashboardScreen({
             marginBottom: 15,
           }}
         >
+
           <Text
             style={{
               color: "white",
-              textAlign:
-                "center",
+              textAlign: "center",
               fontSize: 18,
-              fontWeight:
-                "bold",
+              fontWeight: "bold",
             }}
           >
             View Orders
           </Text>
+
         </TouchableOpacity>
 
-        {/* Notifications */}
+
+        {/* NOTIFICATIONS */}
 
         <TouchableOpacity
           onPress={() =>
@@ -864,21 +1145,22 @@ export default function VendorDashboardScreen({
             marginBottom: 15,
           }}
         >
+
           <Text
             style={{
               color: "white",
-              textAlign:
-                "center",
+              textAlign: "center",
               fontSize: 18,
-              fontWeight:
-                "bold",
+              fontWeight: "bold",
             }}
           >
             🔔 Notifications
           </Text>
+
         </TouchableOpacity>
 
-        {/* ⭐ Customer Reviews */}
+
+        {/* CUSTOMER REVIEWS */}
 
         <TouchableOpacity
           onPress={() =>
@@ -897,23 +1179,24 @@ export default function VendorDashboardScreen({
             marginBottom: 15,
           }}
         >
+
           <Text
             style={{
               color: "white",
-              textAlign:
-                "center",
+              textAlign: "center",
               fontSize: 18,
-              fontWeight:
-                "bold",
+              fontWeight: "bold",
             }}
           >
             ⭐ Customer Reviews
           </Text>
+
         </TouchableOpacity>
 
-                {/* 💰 Settlement History */}
 
-                <TouchableOpacity
+        {/* SETTLEMENT HISTORY */}
+
+        <TouchableOpacity
           onPress={() =>
             navigation.navigate(
               "VendorSettlement",
@@ -930,21 +1213,22 @@ export default function VendorDashboardScreen({
             marginBottom: 15,
           }}
         >
+
           <Text
             style={{
               color: "white",
-              textAlign:
-                "center",
+              textAlign: "center",
               fontSize: 18,
-              fontWeight:
-                "bold",
+              fontWeight: "bold",
             }}
           >
             💰 Settlement History
           </Text>
+
         </TouchableOpacity>
 
-        {/* My Profile */}
+
+        {/* MY PROFILE */}
 
         <TouchableOpacity
           onPress={() =>
@@ -963,19 +1247,22 @@ export default function VendorDashboardScreen({
             marginBottom: 30,
           }}
         >
+
           <Text
             style={{
               color: "white",
-              textAlign:
-                "center",
-              fontWeight:
-                "bold",
+              textAlign: "center",
+              fontWeight: "bold",
               fontSize: 18,
             }}
           >
             My Profile
           </Text>
+
         </TouchableOpacity>
+
+
+        {/* MY PRODUCTS */}
 
         <Text
           style={{
@@ -987,12 +1274,12 @@ export default function VendorDashboardScreen({
           My Products
         </Text>
 
-        {products.length ===
-          0 && (
+
+        {products.length === 0 && (
+
           <Text
             style={{
-              textAlign:
-                "center",
+              textAlign: "center",
               color: "gray",
               marginTop: 20,
               marginBottom: 20,
@@ -1000,10 +1287,13 @@ export default function VendorDashboardScreen({
           >
             No products found
           </Text>
+
         )}
+
 
         {products.map(
           (product) => (
+
             <View
               key={
                 product.firestoreId
@@ -1019,11 +1309,11 @@ export default function VendorDashboardScreen({
                   "#ddd",
               }}
             >
+
               <Text
                 style={{
                   fontSize: 22,
-                  fontWeight:
-                    "bold",
+                  fontWeight: "bold",
                 }}
               >
                 {
@@ -1031,10 +1321,10 @@ export default function VendorDashboardScreen({
                 }
               </Text>
 
+
               <Text
                 style={{
-                  color:
-                    "green",
+                  color: "green",
                   fontSize: 18,
                   marginTop: 5,
                 }}
@@ -1044,6 +1334,7 @@ export default function VendorDashboardScreen({
                 /
                 {product.unit}
               </Text>
+
 
               <Text
                 style={{
@@ -1055,6 +1346,7 @@ export default function VendorDashboardScreen({
                 }
               </Text>
 
+
               <View
                 style={{
                   flexDirection:
@@ -1062,6 +1354,9 @@ export default function VendorDashboardScreen({
                   marginTop: 15,
                 }}
               >
+
+                {/* EDIT */}
+
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate(
@@ -1080,10 +1375,10 @@ export default function VendorDashboardScreen({
                     marginRight: 10,
                   }}
                 >
+
                   <Text
                     style={{
-                      color:
-                        "white",
+                      color: "white",
                       textAlign:
                         "center",
                       fontWeight:
@@ -1092,7 +1387,11 @@ export default function VendorDashboardScreen({
                   >
                     Edit
                   </Text>
+
                 </TouchableOpacity>
+
+
+                {/* DELETE */}
 
                 <TouchableOpacity
                   onPress={() =>
@@ -1108,10 +1407,10 @@ export default function VendorDashboardScreen({
                     borderRadius: 10,
                   }}
                 >
+
                   <Text
                     style={{
-                      color:
-                        "white",
+                      color: "white",
                       textAlign:
                         "center",
                       fontWeight:
@@ -1120,16 +1419,24 @@ export default function VendorDashboardScreen({
                   >
                     Delete
                   </Text>
+
                 </TouchableOpacity>
+
               </View>
+
             </View>
+
           )
         )}
+
+
+        {/* LOGOUT */}
 
         <TouchableOpacity
           onPress={performLogout}
           style={{
-            backgroundColor: "#d32f2f",
+            backgroundColor:
+              "#d32f2f",
             padding: 18,
             borderRadius: 12,
             marginBottom: 40,
@@ -1148,7 +1455,11 @@ export default function VendorDashboardScreen({
           </Text>
 
         </TouchableOpacity>
+
       </View>
+
     </ScrollView>
+
   );
+
 }
