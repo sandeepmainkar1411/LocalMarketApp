@@ -19,8 +19,11 @@ import {
 import {
   getCustomerProfile,
   getVendorProfile,
-  getAgentProfile,
 } from "../services/profileService";
+
+import {
+  getAgentByMobile,
+} from "../services/agentService";
 
 import {
   saveSession,
@@ -32,7 +35,7 @@ export default function RoleSelectionScreen({
 }: any) {
 
   const mobile =
-    route?.params?.mobile;
+    route?.params?.mobile || "";
 
   const [
     user,
@@ -44,9 +47,17 @@ export default function RoleSelectionScreen({
     setLoading,
   ] = useState(true);
 
+
+  /*
+   * LOAD USER
+   */
+
   useEffect(() => {
+
     loadUser();
+
   }, []);
+
 
   const loadUser = async () => {
 
@@ -65,7 +76,7 @@ export default function RoleSelectionScreen({
       }
 
       console.log(
-        "Loading user:",
+        "ROLE SELECTION MOBILE:",
         mobile
       );
 
@@ -75,7 +86,7 @@ export default function RoleSelectionScreen({
         );
 
       console.log(
-        "User from Firestore:",
+        "USER FROM FIRESTORE:",
         result
       );
 
@@ -96,7 +107,7 @@ export default function RoleSelectionScreen({
     } catch (error) {
 
       console.log(
-        "Load User Error:",
+        "LOAD USER ERROR:",
         error
       );
 
@@ -112,6 +123,7 @@ export default function RoleSelectionScreen({
       setLoading(false);
 
     }
+
   };
 
 
@@ -119,10 +131,19 @@ export default function RoleSelectionScreen({
     user?.roles || {};
 
 
+  /*
+   * CUSTOMER
+   */
+
   const openCustomer =
     async () => {
 
       try {
+
+        console.log(
+          "OPEN CUSTOMER:",
+          mobile
+        );
 
         const customer =
           await getCustomerProfile(
@@ -165,8 +186,9 @@ export default function RoleSelectionScreen({
                 "CustomerDashboard",
 
               params: {
-                customer,
+                mobile,
               },
+
             },
 
           ],
@@ -175,7 +197,10 @@ export default function RoleSelectionScreen({
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "OPEN CUSTOMER ERROR:",
+          error
+        );
 
         Alert.alert(
           "Error",
@@ -183,13 +208,23 @@ export default function RoleSelectionScreen({
         );
 
       }
+
     };
 
+
+  /*
+   * VENDOR
+   */
 
   const openVendor =
     async () => {
 
       try {
+
+        console.log(
+          "OPEN VENDOR:",
+          mobile
+        );
 
         const vendor =
           await getVendorProfile(
@@ -199,6 +234,7 @@ export default function RoleSelectionScreen({
         if (!vendor) {
 
           Alert.alert(
+            "Error",
             "Vendor profile not found."
           );
 
@@ -223,19 +259,27 @@ export default function RoleSelectionScreen({
           index: 0,
 
           routes: [
+
             {
-              name: "VendorDashboard",
+              name:
+                "VendorDashboard",
+
               params: {
                 mobile,
               },
+
             },
+
           ],
 
         });
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "OPEN VENDOR ERROR:",
+          error
+        );
 
         Alert.alert(
           "Error",
@@ -243,23 +287,55 @@ export default function RoleSelectionScreen({
         );
 
       }
+
     };
 
+
+  /*
+   * AGENT
+   *
+   * IMPORTANT:
+   * Use getAgentByMobile directly.
+   * Agent records are stored in the
+   * agents collection and this service
+   * already performs the mobile lookup.
+   */
 
   const openAgent =
     async () => {
 
       try {
 
+        console.log(
+          "OPEN AGENT:",
+          mobile
+        );
+
         const agent =
-          await getAgentProfile(
+          await getAgentByMobile(
             mobile
           );
+
+        console.log(
+          "AGENT FROM FIRESTORE:",
+          agent
+        );
 
         if (!agent) {
 
           Alert.alert(
-            "Agent profile not found."
+            "Agent Error",
+            "Agent profile not found for this mobile number."
+          );
+
+          return;
+        }
+
+        if (agent.active === false) {
+
+          Alert.alert(
+            "Agent Inactive",
+            "Your agent account is currently inactive."
           );
 
           return;
@@ -278,6 +354,11 @@ export default function RoleSelectionScreen({
 
         });
 
+        console.log(
+          "NAVIGATING TO AGENT ORDERS:",
+          mobile
+        );
+
         navigation.reset({
 
           index: 0,
@@ -289,8 +370,9 @@ export default function RoleSelectionScreen({
                 "AgentOrders",
 
               params: {
-                agent,
+                mobile,
               },
+
             },
 
           ],
@@ -299,7 +381,10 @@ export default function RoleSelectionScreen({
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "OPEN AGENT ERROR:",
+          error
+        );
 
         Alert.alert(
           "Error",
@@ -307,8 +392,13 @@ export default function RoleSelectionScreen({
         );
 
       }
+
     };
 
+
+  /*
+   * ADMIN
+   */
 
   const openAdmin =
     async () => {
@@ -345,7 +435,10 @@ export default function RoleSelectionScreen({
 
       } catch (error) {
 
-        console.log(error);
+        console.log(
+          "OPEN ADMIN ERROR:",
+          error
+        );
 
         Alert.alert(
           "Error",
@@ -353,24 +446,27 @@ export default function RoleSelectionScreen({
         );
 
       }
+
     };
 
 
   /*
-   * OPEN ADMIN LOGIN
-   *
-   * This is separate from the
-   * Firestore user-role system.
+   * ADMIN LOGIN
    */
 
-  const openAdminLogin = () => {
+  const openAdminLogin =
+    () => {
 
-    navigation.navigate(
-      "AdminLogin"
-    );
+      navigation.navigate(
+        "AdminLogin"
+      );
 
-  };
+    };
 
+
+  /*
+   * LOADING
+   */
 
   if (loading) {
 
@@ -406,8 +502,13 @@ export default function RoleSelectionScreen({
       </View>
 
     );
+
   }
 
+
+  /*
+   * ROLE SELECTION
+   */
 
   return (
 
@@ -427,6 +528,8 @@ export default function RoleSelectionScreen({
         Choose your role
       </Text>
 
+
+      {/* CUSTOMER */}
 
       {roles.customer === true && (
 
@@ -450,6 +553,8 @@ export default function RoleSelectionScreen({
       )}
 
 
+      {/* VENDOR */}
+
       {roles.vendor === true && (
 
         <TouchableOpacity
@@ -471,6 +576,8 @@ export default function RoleSelectionScreen({
 
       )}
 
+
+      {/* AGENT */}
 
       {roles.agent === true && (
 
@@ -494,6 +601,8 @@ export default function RoleSelectionScreen({
       )}
 
 
+      {/* ADMIN */}
+
       {roles.admin === true && (
 
         <TouchableOpacity
@@ -515,6 +624,8 @@ export default function RoleSelectionScreen({
 
       )}
 
+
+      {/* NO ROLE */}
 
       {!roles.customer &&
         !roles.vendor &&
@@ -556,6 +667,7 @@ export default function RoleSelectionScreen({
     </View>
 
   );
+
 }
 
 
@@ -574,6 +686,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   loadingTitle: {
 
     fontSize: 34,
@@ -586,6 +699,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   loadingText: {
 
     marginTop: 15,
@@ -595,6 +709,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
 
   },
+
 
   container: {
 
@@ -609,6 +724,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   title: {
 
     fontSize: 34,
@@ -621,6 +737,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   subTitle: {
 
     textAlign: "center",
@@ -632,6 +749,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
 
   },
+
 
   customerButton: {
 
@@ -646,6 +764,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   vendorButton: {
 
     backgroundColor:
@@ -658,6 +777,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
 
   },
+
 
   agentButton: {
 
@@ -672,6 +792,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   adminButton: {
 
     backgroundColor:
@@ -685,6 +806,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   buttonText: {
 
     color: "#ffffff",
@@ -697,6 +819,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   noRoleText: {
 
     textAlign: "center",
@@ -708,6 +831,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
 
   },
+
 
   adminLoginButton: {
 
@@ -724,6 +848,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
 
   },
+
 
   adminLoginText: {
 

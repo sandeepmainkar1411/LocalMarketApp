@@ -1,7 +1,7 @@
-import { createOrder } from "../services/orderService";
-import {
-  createNotification,
-} from "../services/notificationService";
+import React, {
+  useState,
+  useEffect,
+} from "react";
 
 import {
   View,
@@ -9,25 +9,41 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Alert,
 } from "react-native";
 
 import {
-  useState,
-  useEffect,
-} from "react";
+  createOrder,
+} from "../services/orderService";
+
+import {
+  createNotification,
+} from "../services/notificationService";
 
 import {
   getPlatformFee,
 } from "../services/settingsService";
 
+import {
+  getSession,
+} from "../services/sessionService";
+
 export default function CartScreen({
   navigation,
   route,
 }: any) {
+  // =========================
+  // CART
+  // =========================
+
   const [cartItems, setCartItems] =
-    useState(
+    useState<any[]>(
       route?.params?.cartItems || []
     );
+
+  // =========================
+  // DELIVERY DETAILS
+  // =========================
 
   const [building, setBuilding] =
     useState("");
@@ -41,43 +57,116 @@ export default function CartScreen({
   const [mobile, setMobile] =
     useState("");
 
-  const customer =
-    route?.params?.customer;
+  // =========================
+  // CUSTOMER
+  // =========================
 
-  const [platformFee,
-      setPlatformFee] =
-      useState(0);
+  const [customer, setCustomer] =
+    useState<any>(
+      route?.params?.customer || null
+    );
 
   useEffect(() => {
-  loadPlatformFee();
-}, []);
+    const loadCustomerSession =
+      async () => {
+        try {
+          const session =
+            await getSession();
 
-const loadPlatformFee =
-  async () => {
-    const fee =
-      await getPlatformFee();
+          console.log(
+            "CART CUSTOMER SESSION:",
+            session
+          );
 
-    setPlatformFee(fee);
-  };
+          if (
+            session?.role === "Customer" &&
+            session?.profile
+          ) {
+            setCustomer(
+              session.profile
+            );
+          }
+        } catch (error) {
+          console.log(
+            "Customer session error:",
+            error
+          );
+        }
+      };
+
+    loadCustomerSession();
+  }, []);
+
+  // =========================
+  // PLATFORM FEE
+  // =========================
+
+  const [
+    platformFee,
+    setPlatformFee,
+  ] = useState(0);
+
+  const [
+    placingOrder,
+    setPlacingOrder,
+  ] = useState(false);
+
+  useEffect(() => {
+    const loadPlatformFee =
+      async () => {
+        try {
+          const fee =
+            await getPlatformFee();
+
+          setPlatformFee(
+            Number(fee) || 0
+          );
+        } catch (error) {
+          console.log(
+            "PLATFORM FEE ERROR:",
+            error
+          );
+
+          // Fallback
+          setPlatformFee(20);
+        }
+      };
+
+    loadPlatformFee();
+  }, []);
+
+  // =========================
+  // INCREASE QUANTITY
+  // =========================
 
   const increaseQuantity = (
     id: string
   ) => {
     const updatedItems =
-      cartItems.map((item: any) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            quantity:
-              item.quantity + 1,
-          };
+      cartItems.map(
+        (item: any) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              quantity:
+                Number(
+                  item.quantity || 0
+                ) + 1,
+            };
+          }
+
+          return item;
         }
+      );
 
-        return item;
-      });
-
-    setCartItems(updatedItems);
+    setCartItems(
+      updatedItems
+    );
   };
+
+  // =========================
+  // DECREASE QUANTITY
+  // =========================
 
   const decreaseQuantity = (
     id: string
@@ -90,7 +179,9 @@ const loadPlatformFee =
 
     if (
       selectedItem &&
-      selectedItem.quantity === 1
+      Number(
+        selectedItem.quantity
+      ) === 1
     ) {
       const updatedItems =
         cartItems.filter(
@@ -98,50 +189,374 @@ const loadPlatformFee =
             item.id !== id
         );
 
-      setCartItems(updatedItems);
+      setCartItems(
+        updatedItems
+      );
 
       return;
     }
 
     const updatedItems =
-      cartItems.map((item: any) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            quantity:
-              item.quantity - 1,
-          };
+      cartItems.map(
+        (item: any) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              quantity:
+                Number(
+                  item.quantity || 0
+                ) - 1,
+            };
+          }
+
+          return item;
         }
+      );
 
-        return item;
-      });
-
-    setCartItems(updatedItems);
+    setCartItems(
+      updatedItems
+    );
   };
 
+  // =========================
+  // PRODUCT TOTAL
+  // =========================
+
   const totalAmount =
-  cartItems.reduce(
-    (
-      total: number,
-      item: any
-    ) =>
-      total +
-      item.price *
-        item.quantity,
-    0
-  );
+    cartItems.reduce(
+      (
+        total: number,
+        item: any
+      ) => {
+        const price =
+          Number(item.price) || 0;
 
+        const quantity =
+          Number(item.quantity) || 0;
 
+        return (
+          total +
+          price * quantity
+        );
+      },
+      0
+    );
 
-const grandTotal =
-  totalAmount +
-  platformFee;
+  // =========================
+  // GRAND TOTAL
+  // =========================
+
+  const grandTotal =
+    totalAmount +
+    platformFee;
+
+  // =========================
+  // PLACE ORDER
+  // =========================
+
+  const placeOrder =
+    async () => {
+      // Prevent double click
+      if (placingOrder) {
+        return;
+      }
+
+      // =========================
+      // VALIDATE ADDRESS
+      // =========================
+
+      if (
+        building.trim() === "" ||
+        flat.trim() === "" ||
+        mobile.trim() === ""
+      ) {
+        Alert.alert(
+          "Missing Details",
+          "Please enter building name, flat number and mobile number."
+        );
+
+        return;
+      }
+
+      // =========================
+      // VALIDATE MINIMUM ORDER
+      // =========================
+
+      if (
+        totalAmount < 200
+      ) {
+        Alert.alert(
+          "Minimum Order",
+          "Minimum order should be ₹200."
+        );
+
+        return;
+      }
+
+      setPlacingOrder(true);
+
+      try {
+        // =========================
+        // CUSTOMER DETAILS
+        // =========================
+
+        const customerName =
+          customer?.customerName ||
+          customer?.name ||
+          "Unknown Customer";
+
+        const customerMobile =
+          customer?.mobile ||
+          "";
+
+        console.log(
+          "CUSTOMER NAME:",
+          customerName
+        );
+
+        console.log(
+          "CUSTOMER MOBILE:",
+          customerMobile
+        );
+
+        // =========================
+        // CREATE ORDER
+        // =========================
+
+        const newOrder = {
+          customerName:
+            customerName,
+
+          customerMobile:
+            customerMobile,
+
+          vendorName:
+            cartItems[0]?.vendorName ||
+            "",
+
+          locality:
+            cartItems[0]?.locality ||
+            "",
+
+          items:
+            cartItems.map(
+              (item: any) => ({
+                ...item,
+
+                price:
+                  Number(
+                    item.price
+                  ) || 0,
+
+                quantity:
+                  Number(
+                    item.quantity
+                  ) || 0,
+              })
+            ),
+
+          subtotal:
+            totalAmount,
+
+          platformFee:
+            platformFee,
+
+          total:
+            grandTotal,
+
+          address: {
+            building:
+              building.trim(),
+
+            flat:
+              flat.trim(),
+
+            landmark:
+              landmark.trim(),
+
+            mobile:
+              mobile.trim(),
+          },
+
+          status:
+            "Placed",
+
+          createdAt:
+            new Date(),
+        };
+
+        console.log(
+          "================================"
+        );
+
+        console.log(
+          "CREATING ORDER:"
+        );
+
+        console.log(
+          newOrder
+        );
+
+        console.log(
+          "================================"
+        );
+
+        // =========================
+        // SAVE ORDER TO FIRESTORE
+        // =========================
+
+        const orderId =
+          await createOrder(
+            newOrder
+          );
+
+        console.log(
+          "ORDER CREATED SUCCESSFULLY:"
+        );
+
+        console.log(
+          orderId
+        );
+
+        // =========================
+        // CUSTOMER SUCCESS
+        // =========================
+        //
+        // IMPORTANT:
+        // Navigate immediately after
+        // Firestore confirms the order.
+        //
+        // Notification is handled AFTER
+        // this and cannot block the customer.
+        // =========================
+
+        navigation.navigate(
+          "OrderSuccess",
+          {
+            customer: {
+              ...customer,
+
+              mobile:
+                customerMobile,
+
+              customerName:
+                customerName,
+            },
+
+            orderNumber:
+              orderId,
+
+            total:
+              grandTotal,
+          }
+        );
+
+        // =========================
+        // VENDOR NOTIFICATION
+        // =========================
+        //
+        // This runs after navigation.
+        // If notification fails, the order
+        // is still successfully placed.
+        // =========================
+
+        try {
+          await createNotification({
+            vendorName:
+              cartItems[0]
+                ?.vendorName || "",
+
+            customer:
+              customerName,
+
+            mobile:
+              customerMobile,
+
+            customerMobile:
+              customerMobile,
+
+            locality:
+              cartItems[0]
+                ?.locality || "",
+
+            address:
+              building.trim(),
+
+            items:
+              cartItems,
+
+            total:
+              grandTotal,
+
+            orderNumber:
+              orderId,
+
+            title:
+              "New Order Received",
+
+            message:
+              `${customerName} placed an order worth ₹${grandTotal}`,
+
+            read:
+              false,
+
+            createdAt:
+              new Date().toISOString(),
+          });
+
+          console.log(
+            "VENDOR NOTIFICATION CREATED"
+          );
+        } catch (
+          notificationError
+        ) {
+          console.log(
+            "NOTIFICATION ERROR:",
+            notificationError
+          );
+
+          // DO NOT show order failure.
+          // Order has already been created.
+        }
+
+      } catch (error) {
+        console.log(
+          "================================"
+        );
+
+        console.log(
+          "PLACE ORDER ERROR:"
+        );
+
+        console.log(
+          error
+        );
+
+        console.log(
+          "================================"
+        );
+
+        Alert.alert(
+          "Order Failed",
+          "Unable to place the order. Please try again."
+        );
+      } finally {
+        setPlacingOrder(
+          false
+        );
+      }
+    };
+
+  // =========================
+  // UI
+  // =========================
 
   return (
     <ScrollView
       style={{
         flex: 1,
-        backgroundColor: "#f5f5f5",
+        backgroundColor:
+          "#f5f5f5",
       }}
     >
       <View
@@ -149,6 +564,11 @@ const grandTotal =
           padding: 20,
         }}
       >
+
+        {/* =========================
+            HEADER
+        ========================= */}
+
         <Text
           style={{
             fontSize: 32,
@@ -159,6 +579,10 @@ const grandTotal =
         >
           My Cart 🛒
         </Text>
+
+        {/* =========================
+            EMPTY CART
+        ========================= */}
 
         {cartItems.length === 0 && (
           <Text
@@ -172,6 +596,10 @@ const grandTotal =
             Cart is Empty
           </Text>
         )}
+
+        {/* =========================
+            CART ITEMS
+        ========================= */}
 
         {cartItems.map(
           (item: any) => (
@@ -195,6 +623,7 @@ const grandTotal =
                 borderColor: "#ddd",
               }}
             >
+
               <Text
                 style={{
                   fontSize: 24,
@@ -226,14 +655,35 @@ const grandTotal =
               <Text
                 style={{
                   fontSize: 18,
+
                   color: "green",
-                  fontWeight: "bold",
+
+                  fontWeight:
+                    "bold",
+
                   marginBottom: 15,
                 }}
               >
-                ₹{item.price} × {item.quantity}
-                = ₹{item.price * item.quantity}
+                ₹
+                {Number(
+                  item.price
+                ) || 0}
+                {" × "}
+                {Number(
+                  item.quantity
+                ) || 0}
+                {" = ₹"}
+                {
+                  (Number(
+                    item.price
+                  ) || 0) *
+                  (Number(
+                    item.quantity
+                  ) || 0)
+                }
               </Text>
+
+              {/* QUANTITY CONTROLS */}
 
               <View
                 style={{
@@ -247,6 +697,9 @@ const grandTotal =
                     "space-between",
                 }}
               >
+
+                {/* MINUS */}
+
                 <TouchableOpacity
                   onPress={() =>
                     decreaseQuantity(
@@ -285,6 +738,8 @@ const grandTotal =
                   </Text>
                 </TouchableOpacity>
 
+                {/* QUANTITY */}
+
                 <Text
                   style={{
                     fontSize: 22,
@@ -295,6 +750,8 @@ const grandTotal =
                 >
                   {item.quantity}
                 </Text>
+
+                {/* PLUS */}
 
                 <TouchableOpacity
                   onPress={() =>
@@ -333,13 +790,24 @@ const grandTotal =
                     +
                   </Text>
                 </TouchableOpacity>
+
               </View>
+
             </View>
           )
         )}
 
+        {/* =========================
+            CHECKOUT
+        ========================= */}
+
         {cartItems.length > 0 && (
           <>
+
+            {/* =========================
+                DELIVERY ADDRESS
+            ========================= */}
+
             <View
               style={{
                 backgroundColor:
@@ -356,6 +824,7 @@ const grandTotal =
                 borderColor: "#ddd",
               }}
             >
+
               <Text
                 style={{
                   fontSize: 24,
@@ -371,7 +840,9 @@ const grandTotal =
 
               <TextInput
                 placeholder="Building Name"
-                value={building}
+                value={
+                  building
+                }
                 onChangeText={
                   setBuilding
                 }
@@ -391,8 +862,12 @@ const grandTotal =
 
               <TextInput
                 placeholder="Flat Number"
-                value={flat}
-                onChangeText={setFlat}
+                value={
+                  flat
+                }
+                onChangeText={
+                  setFlat
+                }
                 style={{
                   backgroundColor:
                     "#f5f5f5",
@@ -409,7 +884,9 @@ const grandTotal =
 
               <TextInput
                 placeholder="Landmark"
-                value={landmark}
+                value={
+                  landmark
+                }
                 onChangeText={
                   setLandmark
                 }
@@ -430,8 +907,12 @@ const grandTotal =
               <TextInput
                 placeholder="Mobile Number"
                 keyboardType="numeric"
-                value={mobile}
-                onChangeText={setMobile}
+                value={
+                  mobile
+                }
+                onChangeText={
+                  setMobile
+                }
                 style={{
                   backgroundColor:
                     "#f5f5f5",
@@ -445,7 +926,12 @@ const grandTotal =
                   fontSize: 16,
                 }}
               />
+
             </View>
+
+            {/* =========================
+                ORDER SUMMARY
+            ========================= */}
 
             <View
               style={{
@@ -463,64 +949,76 @@ const grandTotal =
                 borderColor: "#ddd",
               }}
             >
+
               <Text
                 style={{
                   fontSize: 24,
-                  fontWeight: "bold",
+
+                  fontWeight:
+                    "bold",
+
                   marginBottom: 20,
                 }}
               >
                 Order Summary
               </Text>
 
-              <View
+              <Text
                 style={{
+                  fontSize: 18,
+
                   marginBottom: 10,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 18,
-                  }}
-                >
-                  Products Total:
-                  ₹{totalAmount}
-                </Text>
+                Products Total:
+                {" "}
+                ₹{totalAmount}
+              </Text>
 
-                <Text
-                  style={{
-                    fontSize: 18,
-                    marginTop: 10,
-                  }}
-                >
-                  Platform Fee:
-                  ₹{platformFee}
-                </Text>
+              <Text
+                style={{
+                  fontSize: 18,
 
-                <View
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: "#ddd",
-                    marginVertical: 15,
-                  }}
-                />
+                  marginBottom: 15,
+                }}
+              >
+                Platform Fee:
+                {" "}
+                ₹{platformFee}
+              </Text>
 
-                <Text
-                  style={{
-                    fontSize: 30,
-                    color: "green",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Grand Total:
-                  ₹{grandTotal}
-                </Text>
-              </View>
+              <View
+                style={{
+                  borderBottomWidth:
+                    1,
+
+                  borderColor:
+                    "#ddd",
+
+                  marginBottom: 15,
+                }}
+              />
+
+              <Text
+                style={{
+                  fontSize: 30,
+
+                  color: "green",
+
+                  fontWeight:
+                    "bold",
+                }}
+              >
+                Grand Total:
+                {" "}
+                ₹{grandTotal}
+              </Text>
 
               {totalAmount < 200 && (
                 <Text
                   style={{
-                    color: "red",
+                    color:
+                      "red",
 
                     marginTop: 10,
 
@@ -532,142 +1030,61 @@ const grandTotal =
                   be ₹200
                 </Text>
               )}
+
             </View>
+
+            {/* =========================
+                PLACE ORDER
+            ========================= */}
 
             <TouchableOpacity
               disabled={
-                totalAmount < 200
+                totalAmount < 200 ||
+                placingOrder
               }
-              onPress={async () => {
-                if (
-                  building.trim() ===
-                    "" ||
-                  flat.trim() ===
-                    "" ||
-                  mobile.trim() === ""
-                ) {
-                  alert(
-                    "Please enter delivery details"
-                  );
+              onPress={
+                placeOrder
+              }
+              style={{
+                backgroundColor:
+                  totalAmount >= 200 &&
+                  !placingOrder
+                    ? "green"
+                    : "gray",
 
-                  return;
-                }
+                padding: 20,
 
-                const newOrder = {
+                borderRadius: 12,
 
-                  orderNumber:
-                    "LM-" + Date.now(),
+                marginBottom: 40,
+              }}
+            >
 
-                  customerName:
-                    customer?.customerName ||
-                    "Unknown Customer",
-
-                  customerMobile:
-                    customer?.mobile || "",
-
-                  vendorName:
-                    cartItems[0]?.vendorName || "",
-
-                  locality:
-                    cartItems[0]?.locality || "",
-
-                  items: cartItems,
-
-                  subtotal:
-                    totalAmount,
-
-                  platformFee:
-                    platformFee,
-
-                  total:
-                    grandTotal,
-
-                  address: {
-                    building,
-                    flat,
-                    landmark,
-                    mobile,
-                  },
-
-                  status: "Placed",
-
-                  createdAt:
-                    new Date(),
-                };
-
-                await createOrder(
-                  newOrder
-                );
-                
-                await createNotification({
-                  vendorName:
-                    cartItems[0]?.vendorName || "",
-
-                  customer:
-                    customer?.customerName ||
-                    "Unknown Customer",
-
-                  mobile:
-                    mobile,
-
-                  locality:
-                    cartItems[0]?.locality || "",
-
-                  address:
-                    building,
-
-                  items:
-                    cartItems,
-
-                  total:
-                    grandTotal,
-
-                  title:
-                    "New Order Received",
-
-                  message:
-                    `${customer?.customerName || "Customer"} placed an order worth ₹${grandTotal}`,
-
-                  read: false,
-
-                  createdAt:
-                    new Date().toISOString(),
-                });
-
-                navigation.navigate(
-                  "OrderSuccess",
-                  {
-                    customer,
-                  }
-                );
-                }}
+              <Text
                 style={{
-                  backgroundColor:
-                    totalAmount >= 200
-                      ? "green"
-                      : "gray",
+                  color:
+                    "white",
 
-                  padding: 20,
+                  textAlign:
+                    "center",
 
-                  borderRadius: 12,
+                  fontSize: 20,
 
-                  marginBottom: 40,
+                  fontWeight:
+                    "bold",
                 }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontSize: 20,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Place Order
-                  </Text>
-                  </TouchableOpacity>
-                  </>
-                  )}
-                  </View>
-                  </ScrollView>
-                  );
-                  }
+              >
+                {placingOrder
+                  ? "Placing Order..."
+                  : "Place Order"}
+              </Text>
+
+            </TouchableOpacity>
+
+          </>
+        )}
+
+      </View>
+    </ScrollView>
+  );
+}

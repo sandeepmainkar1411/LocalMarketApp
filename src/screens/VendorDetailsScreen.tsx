@@ -1,4 +1,3 @@
-                        
 import {
   View,
   Text,
@@ -69,16 +68,13 @@ export default function VendorDetailsScreen({
   const [products, setProducts] =
     useState<any[]>([]);
 
-  const [selectedCategory,
-    setSelectedCategory] =
+  const [selectedCategory, setSelectedCategory] =
     useState("Vegetable");
 
   const [cartItems, setCartItems] =
     useState<any[]>(
       route?.params?.cartItems || []
     );
-
-    
 
   const [
     selectedQuantities,
@@ -91,11 +87,10 @@ export default function VendorDetailsScreen({
         (allProducts: any[]) => {
           const vendorProducts =
             allProducts.filter(
-              (product) =>
+              (product: any) =>
                 product.vendorName ===
                   vendor.name &&
-                product.available ===
-                  true
+                product.available === true
             );
 
           setProducts(vendorProducts);
@@ -109,21 +104,44 @@ export default function VendorDetailsScreen({
     product: any,
     selectedQuantity: any
   ) => {
-    const quantity =
-      selectedQuantity?.value || 1;
+    const selectedValue =
+      Number(
+        selectedQuantity?.value || 1
+      );
 
     const displayQuantity =
       selectedQuantity?.label ||
-      (product.unit === "KG"
-        ? "1 KG"
-        : "1");
+      (
+        product.unit === "KG"
+          ? "1 KG"
+          : "1"
+      );
 
-    const calculatedPrice =
-      product.price * quantity;
+    /*
+     * PRICE OF ONE SELECTED PACKAGE
+     *
+     * Example:
+     *
+     * Product = ₹250 / KG
+     *
+     * 1 KG   = ₹250
+     * 500 gm = ₹125
+     * 250 gm = ₹62.50
+     * 100 gm = ₹25
+     *
+     * For piece products:
+     * ₹250 × 1 piece = ₹250
+     */
+
+    const unitPrice =
+      product.unit === "KG"
+        ? Number(product.price || 0) *
+          selectedValue
+        : Number(product.price || 0);
 
     const existingItem =
       cartItems.find(
-        (item) =>
+        (item: any) =>
           item.id === product.id &&
           item.displayQuantity ===
             displayQuantity
@@ -132,47 +150,79 @@ export default function VendorDetailsScreen({
     let updatedCart: any[] = [];
 
     if (existingItem) {
-      updatedCart = cartItems.map(
-        (item) => {
-          if (
-            item.id === product.id &&
-            item.displayQuantity ===
-              displayQuantity
-          ) {
-            return {
-              ...item,
-              quantity:
-                item.quantity +
-                quantity,
+      /*
+       * Same product and same package size.
+       *
+       * Increase the number of packages,
+       * but keep price as the price
+       * of ONE package.
+       */
 
-              price:
-                item.price +
-                calculatedPrice,
-            };
+      updatedCart =
+        cartItems.map(
+          (item: any) => {
+            if (
+              item.id === product.id &&
+              item.displayQuantity ===
+                displayQuantity
+            ) {
+              return {
+                ...item,
+
+                quantity:
+                  Number(item.quantity || 0) +
+                  1,
+
+                price:
+                  unitPrice,
+              };
+            }
+
+            return item;
           }
-
-          return item;
-        }
-      );
+        );
     } else {
+      /*
+       * First item of this
+       * product/package combination.
+       */
+
       const newItem = {
-        id: product.id,
-      
-        name: product.vegetable,
-      
-        quantity,
-      
-        displayQuantity,
-      
-        price: calculatedPrice,
-      
-        basePrice: product.price,
-      
-        unit: product.unit,
-      
+        id:
+          product.id,
+
+        name:
+          product.vegetable,
+
+        /*
+         * Number of selected packages.
+         */
+        quantity: 1,
+
+        /*
+         * Selected package.
+         */
+        displayQuantity:
+          displayQuantity,
+
+        /*
+         * Price of ONE selected package.
+         */
+        price:
+          unitPrice,
+
+        /*
+         * Original product price.
+         */
+        basePrice:
+          Number(product.price || 0),
+
+        unit:
+          product.unit,
+
         vendorName:
           product.vendorName,
-      
+
         locality:
           product.locality,
       };
@@ -183,9 +233,13 @@ export default function VendorDetailsScreen({
       ];
     }
 
-    setCartItems(updatedCart);
+    setCartItems(
+      updatedCart
+    );
 
-    alert("Added to Cart");
+    alert(
+      "Added to Cart"
+    );
   };
 
   const totalCartItems =
@@ -308,202 +362,213 @@ export default function VendorDetailsScreen({
             </TouchableOpacity>
           </View>
 
-
           {products.filter(
-              (product) =>
-                (product.category ||
-                  "Vegetable") ===
-                selectedCategory
-            ).length === 0 && (
-              <Text
-                style={{
-                  textAlign: "center",
-                  color: "gray",
-                  fontSize: 18,
-                  marginTop: 30,
-                  marginBottom: 30,
-                }}
-              >
-                No {selectedCategory}s available
-              </Text>
-            )}
+            (product: any) =>
+              (product.category ||
+                "Vegetable") ===
+              selectedCategory
+          ).length === 0 && (
+            <Text
+              style={{
+                textAlign: "center",
+                color: "gray",
+                fontSize: 18,
+                marginTop: 30,
+                marginBottom: 30,
+              }}
+            >
+              No {selectedCategory}s available
+            </Text>
+          )}
 
           {products
             .filter(
-              (product) =>
+              (product: any) =>
                 (product.category ||
                   "Vegetable") ===
                 selectedCategory
             )
-            .map((product) => (
-            <View
-              key={product.id}
-              style={{
-                backgroundColor:
-                  "#ffffff",
+            .map(
+              (product: any) => (
+                <View
+                  key={product.id}
+                  style={{
+                    backgroundColor:
+                      "#ffffff",
 
-                padding: 20,
+                    padding: 20,
 
-                borderRadius: 15,
+                    borderRadius: 15,
 
-                marginBottom: 20,
+                    marginBottom: 20,
 
-                borderWidth: 1,
+                    borderWidth: 1,
 
-                borderColor: "#ddd",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 28,
-                  fontWeight: "bold",
-                  marginBottom: 10,
-                }}
-              >
-                {(product.category ===
-                "Fruit"
-                  ? "🍎 "
-                  : "🥬 ") +
-                  product.vegetable}
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: 24,
-
-                  color: "green",
-
-                  fontWeight:
-                    "bold",
-
-                  marginBottom: 10,
-                }}
-              >
-                ₹{product.price} /{" "}
-                {product.unit}
-              </Text>
-
-              <Text
-                style={{
-                  color: "green",
-
-                  fontWeight:
-                    "bold",
-
-                  fontSize: 18,
-
-                  marginBottom: 15,
-                }}
-              >
-                🟢 In Stock
-              </Text>
-
-              <View
-                style={{
-                  flexDirection: "row",
-
-                  flexWrap: "wrap",
-
-                  marginBottom: 15,
-                }}
-              >
-                {(product.unit ===
-                "KG"
-                  ? kgOptions
-                  : pieceOptions
-                ).map((option) => (
-                  <TouchableOpacity
-                    key={
-                      option.label
-                    }
-                    onPress={() =>
-                      setSelectedQuantities(
-                        {
-                          ...selectedQuantities,
-
-                          [product.id]:
-                            option,
-                        }
-                      )
-                    }
+                    borderColor: "#ddd",
+                  }}
+                >
+                  <Text
                     style={{
-                      backgroundColor:
-                        selectedQuantities[
-                          product.id
-                        ]?.label ===
-                        option.label
-                          ? "orange"
-                          : "#eeeeee",
+                      fontSize: 28,
+                      fontWeight:
+                        "bold",
+                      marginBottom: 10,
+                    }}
+                  >
+                    {(
+                      product.category ===
+                      "Fruit"
+                        ? "🍎 "
+                        : "🥬 "
+                    ) +
+                      product.vegetable}
+                  </Text>
 
-                      paddingVertical: 10,
+                  <Text
+                    style={{
+                      fontSize: 24,
 
-                      paddingHorizontal: 14,
+                      color: "green",
 
-                      borderRadius: 10,
-
-                      marginRight: 10,
+                      fontWeight:
+                        "bold",
 
                       marginBottom: 10,
                     }}
                   >
+                    ₹{product.price} /{" "}
+                    {product.unit}
+                  </Text>
+
+                  <Text
+                    style={{
+                      color: "green",
+
+                      fontWeight:
+                        "bold",
+
+                      fontSize: 18,
+
+                      marginBottom: 15,
+                    }}
+                  >
+                    🟢 In Stock
+                  </Text>
+
+                  <View
+                    style={{
+                      flexDirection:
+                        "row",
+
+                      flexWrap:
+                        "wrap",
+
+                      marginBottom: 15,
+                    }}
+                  >
+                    {(
+                      product.unit ===
+                      "KG"
+                        ? kgOptions
+                        : pieceOptions
+                    ).map(
+                      (option: any) => (
+                        <TouchableOpacity
+                          key={
+                            option.label
+                          }
+                          onPress={() =>
+                            setSelectedQuantities(
+                              {
+                                ...selectedQuantities,
+
+                                [product.id]:
+                                  option,
+                              }
+                            )
+                          }
+                          style={{
+                            backgroundColor:
+                              selectedQuantities[
+                                product.id
+                              ]?.label ===
+                              option.label
+                                ? "orange"
+                                : "#eeeeee",
+
+                            paddingVertical:
+                              10,
+
+                            paddingHorizontal:
+                              14,
+
+                            borderRadius: 10,
+
+                            marginRight: 10,
+
+                            marginBottom: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color:
+                                selectedQuantities[
+                                  product.id
+                                ]?.label ===
+                                option.label
+                                  ? "white"
+                                  : "black",
+
+                              fontWeight:
+                                "bold",
+                            }}
+                          >
+                            {
+                              option.label
+                            }
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    )}
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      addToCart(
+                        product,
+                        selectedQuantities[
+                          product.id
+                        ]
+                      )
+                    }
+                    style={{
+                      backgroundColor:
+                        "green",
+
+                      padding: 18,
+
+                      borderRadius: 12,
+                    }}
+                  >
                     <Text
                       style={{
-                        color:
-                          selectedQuantities[
-                            product.id
-                          ]?.label ===
-                          option.label
-                            ? "white"
-                            : "black",
+                        color: "white",
+
+                        textAlign:
+                          "center",
 
                         fontWeight:
                           "bold",
+
+                        fontSize: 20,
                       }}
                     >
-                      {
-                        option.label
-                      }
+                      Add To Cart
                     </Text>
                   </TouchableOpacity>
-                ))}
-              </View>
-
-              <TouchableOpacity
-                onPress={() =>
-                  addToCart(
-                    product,
-                    selectedQuantities[
-                      product.id
-                    ]
-                  )
-                }
-                style={{
-                  backgroundColor:
-                    "green",
-
-                  padding: 18,
-
-                  borderRadius: 12,
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white",
-
-                    textAlign:
-                      "center",
-
-                    fontWeight:
-                      "bold",
-
-                    fontSize: 20,
-                  }}
-                >
-                  Add To Cart
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+                </View>
+              )
+            )}
         </View>
       </ScrollView>
 

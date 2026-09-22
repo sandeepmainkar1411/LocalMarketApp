@@ -187,6 +187,31 @@ export default function AdminDashboardScreen({
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(
+            "AdminManageAgents"
+          )
+        }
+        style={{
+          backgroundColor: "#673AB7",
+          padding: 20,
+          borderRadius: 12,
+          marginBottom: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 20,
+          }}
+        >
+          🚚 Manage Agents
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(
             "AdminSettlement"
           )
         }

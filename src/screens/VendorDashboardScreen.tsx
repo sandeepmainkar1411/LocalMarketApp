@@ -21,6 +21,10 @@ import {
 } from "../services/vendorService";
 
 import {
+  getVendorProfile,
+} from "../services/profileService";
+
+import {
   subscribeToOrders,
 } from "../services/orderService";
 
@@ -42,13 +46,91 @@ export default function VendorDashboardScreen({
   route,
 }: any) {
 
-  const vendor =
-    route?.params?.vendor;
+  /*
+   * IDENTIFY VENDOR USING MOBILE NUMBER
+   *
+   * The login flow passes the vendor mobile number.
+   * We then load the actual vendor profile from Firestore.
+   */
+
+  const mobile =
+    route?.params?.mobile ||
+    route?.params?.vendor?.mobile ||
+    "";
+
+  const [vendor, setVendor] =
+    useState<any>(
+      route?.params?.vendor || null
+    );
+
+  const [vendorLoaded, setVendorLoaded] =
+    useState(false);
 
   console.log(
-    "LOGGED IN VENDOR",
-    vendor
+    "VENDOR MOBILE:",
+    mobile
   );
+
+  /*
+   * LOAD THE CORRECT VENDOR
+   */
+
+  useEffect(() => {
+
+    const loadVendor =
+      async () => {
+
+        try {
+
+          if (!mobile) {
+
+            console.log(
+              "Vendor mobile missing"
+            );
+
+            return;
+          }
+
+          console.log(
+            "Loading vendor profile:",
+            mobile
+          );
+
+          const result =
+            await getVendorProfile(
+              mobile
+            );
+
+          console.log(
+            "VENDOR PROFILE:",
+            result
+          );
+
+          if (result) {
+
+            setVendor(result);
+
+          }
+
+        } catch (error) {
+
+          console.log(
+            "Load Vendor Error:",
+            error
+          );
+
+        } finally {
+
+          setVendorLoaded(true);
+
+        }
+
+      };
+
+    loadVendor();
+
+  }, [mobile]);
+
 
   const vendorName =
     vendor?.vendorName ||
@@ -379,13 +461,263 @@ export default function VendorDashboardScreen({
 
 
           /*
-           * VENDOR RANK
-           *
-           * For now this is #1.
-           * We can make this dynamic later.
-           */
+            * DYNAMIC VENDOR RANK
+            *
+            * Score:
+            * Revenue = 50%
+            * Orders  = 30%
+            * Rating  = 20%
+            */
 
-          setVendorRank(1);
+            try {
+
+              const allVendors =
+                await fetchVendors();
+
+              /*
+              * Build performance data
+              * for every vendor.
+              */
+
+              const vendorPerformance =
+                await Promise.all(
+
+                  allVendors.map(
+                    async (v: any) => {
+
+                      const name =
+                        v?.vendorName ||
+                        v?.name ||
+                        "";
+
+                      /*
+                      * Orders belonging
+                      * to this vendor.
+                      */
+
+                      const ordersForVendor =
+                        orders.filter(
+                          (order: any) =>
+                            order.vendorName ===
+                            name
+                        );
+
+                      const revenue =
+                        ordersForVendor.reduce(
+                          (
+                            sum: number,
+                            order: any
+                          ) =>
+                            sum +
+                            Number(
+                              order.total || 0
+                            ),
+                          0
+                        );
+
+                      const orderCount =
+                        ordersForVendor.length;
+
+                      /*
+                      * Vendor rating.
+                      */
+
+                      let rating = 0;
+
+                      try {
+
+                        const ratingData =
+                          await getVendorRating(
+                            name
+                          );
+
+                        rating =
+                          Number(
+                            ratingData?.average || 0
+                          );
+
+                      } catch {
+
+                        rating = 0;
+
+                      }
+
+                      return {
+                        name,
+                        revenue,
+                        orderCount,
+                        rating,
+                      };
+
+                    }
+                  )
+                );
+
+              /*
+              * Make sure the currently
+              * logged-in vendor is included.
+              */
+
+              const currentVendorExists =
+                vendorPerformance.some(
+                  (item: any) =>
+                    item.name === vendorName
+                );
+
+              if (
+                !currentVendorExists &&
+                vendorName
+              ) {
+
+                let currentRating = 0;
+
+                try {
+
+                  const ratingData =
+                    await getVendorRating(
+                      vendorName
+                    );
+
+                  currentRating =
+                    Number(
+                      ratingData?.average || 0
+                    );
+
+                } catch {
+
+                  currentRating = 0;
+
+                }
+
+                vendorPerformance.push({
+                  name: vendorName,
+                  revenue: lifetimeRevenue,
+                  orderCount:
+                    vendorOrders.length,
+                  rating:
+                    currentRating,
+                });
+
+              }
+
+              /*
+              * Find the highest values.
+              */
+
+              const highestRevenue =
+                Math.max(
+                  ...vendorPerformance.map(
+                    (v: any) =>
+                      Number(v.revenue || 0)
+                  ),
+                  0
+                );
+
+              const highestOrders =
+                Math.max(
+                  ...vendorPerformance.map(
+                    (v: any) =>
+                      Number(v.orderCount || 0)
+                  ),
+                  0
+                );
+
+              /*
+              * Calculate final score
+              * for every vendor.
+              */
+
+              const scoredVendors =
+                vendorPerformance.map(
+                  (v: any) => {
+
+                    const revenueScore =
+                      highestRevenue > 0
+                        ? (
+                            Number(v.revenue || 0) /
+                            highestRevenue
+                          ) * 50
+                        : 0;
+
+                    const orderScore =
+                      highestOrders > 0
+                        ? (
+                            Number(v.orderCount || 0) /
+                            highestOrders
+                          ) * 30
+                        : 0;
+
+                    const ratingScore =
+                      (
+                        Number(v.rating || 0) /
+                        5
+                      ) * 20;
+
+                    const totalScore =
+                      revenueScore +
+                      orderScore +
+                      ratingScore;
+
+                    return {
+                      ...v,
+                      score:
+                        totalScore,
+                    };
+
+                  }
+                );
+
+              /*
+              * Sort highest score first.
+              */
+
+              scoredVendors.sort(
+                (a: any, b: any) =>
+                  b.score - a.score
+              );
+
+              /*
+              * Find the logged-in
+              * vendor's position.
+              */
+
+              const currentIndex =
+                scoredVendors.findIndex(
+                  (v: any) =>
+                    v.name === vendorName
+                );
+
+              if (
+                currentIndex >= 0
+              ) {
+
+                setVendorRank(
+                  currentIndex + 1
+                );
+
+              } else {
+
+                setVendorRank(
+                  scoredVendors.length || 1
+                );
+
+              }
+
+              console.log(
+                "VENDOR RANKING:",
+                scoredVendors
+              );
+
+            } catch (rankError) {
+
+              console.log(
+                "Vendor Ranking Error:",
+                rankError
+              );
+
+              setVendorRank(1);
+
+            }
 
 
           /*

@@ -29,6 +29,7 @@ import VendorProfileEditScreen from "../screens/VendorProfileEditScreen";
 import AdminLoginScreen from "../screens/AdminLoginScreen";
 import AdminDashboardScreen from "../screens/AdminDashboardScreen";
 import AdminManageVendorsScreen from "../screens/AdminManageVendorsScreen";
+import AdminManageAgentsScreen from "../screens/AdminManageAgentsScreen";
 import AdminManageLocalitiesScreen from "../screens/AdminManageLocalitiesScreen";
 import VendorApprovalPendingScreen from "../screens/VendorApprovalPendingScreen";
 import VendorNotificationsScreen from "../screens/VendorNotificationsScreen";
@@ -258,6 +259,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="AdminManageVendors"
         component={AdminManageVendorsScreen}
+      />
+
+      <Stack.Screen
+        name="AdminManageAgents"
+        component={AdminManageAgentsScreen}
       />
 
       <Stack.Screen

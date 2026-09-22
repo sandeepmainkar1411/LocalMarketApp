@@ -18,6 +18,10 @@ import {
 } from "../services/vendorService";
 
 import {
+  getAgentByMobile,
+} from "../services/agentService";
+
+import {
   doc,
   setDoc,
 } from "firebase/firestore";
@@ -150,7 +154,7 @@ export default function LoginScreen({
        * STEP 2
        * User was not found.
        *
-       * Now check whether this
+       * Check whether this
        * mobile belongs to a vendor.
        */
 
@@ -330,10 +334,136 @@ export default function LoginScreen({
 
       /*
        * STEP 3
-       * Neither a user nor a vendor
-       * exists.
+       * User and Vendor were not found.
        *
-       * Treat as a completely new user.
+       * Now check Agents.
+       */
+
+      console.log(
+        "VENDOR NOT FOUND - CHECKING AGENTS"
+      );
+
+      const agent =
+        await getAgentByMobile(
+          enteredMobile
+        );
+
+      console.log(
+        "AGENT MATCH:",
+        agent
+      );
+
+      /*
+       * EXISTING AGENT
+       */
+
+      if (agent) {
+
+        console.log(
+          "EXISTING AGENT FOUND"
+        );
+
+        console.log(
+          "Agent Active:",
+          agent.active
+        );
+
+        /*
+         * Agent is inactive.
+         */
+
+        if (
+          agent.active !== true
+        ) {
+
+          alert(
+            "Your agent account is currently inactive."
+          );
+
+          return;
+        }
+
+        /*
+         * Agent is active.
+         *
+         * Create/update the corresponding
+         * user record so Role Selection
+         * can identify the Agent role.
+         */
+
+        console.log(
+          "ACTIVE AGENT FOUND"
+        );
+
+        const userRef =
+          doc(
+            db,
+            "users",
+            enteredMobile
+          );
+
+        await setDoc(
+          userRef,
+          {
+            mobile:
+              enteredMobile,
+
+            roles: {
+              customer:
+                false,
+
+              vendor:
+                false,
+
+              agent:
+                true,
+
+              admin:
+                false,
+            },
+
+            approved:
+              true,
+
+            active:
+              true,
+
+            createdAt:
+              new Date().toISOString(),
+          },
+          {
+            merge: true,
+          }
+        );
+
+        console.log(
+          "AGENT USER RECORD CREATED"
+        );
+
+        /*
+         * Continue to OTP.
+         */
+
+        navigation.navigate(
+          "OtpVerification",
+          {
+            mobile:
+              enteredMobile,
+
+            isNewUser:
+              false,
+          }
+        );
+
+        return;
+      }
+
+      /*
+       * STEP 4
+       * Neither User, Vendor,
+       * nor Agent exists.
+       *
+       * Treat as a new user.
        */
 
       console.log(
